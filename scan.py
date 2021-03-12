@@ -12,6 +12,7 @@ scan_time, ipv4_addresses, ipv6_addresses, and http_server
 
 import time
 import json
+import sys  # necessary for sys.argv
 
 
 """
@@ -20,4 +21,13 @@ with open(<filename we want to make it as>, "w") as f:
 json.dump(json_object, f, sort_keys =True, indent=4)
 """
 
+# Extract from the textfile
 url_list = []
+
+filename = sys.argv[1]
+
+with open(filename, 'r') as reader:
+    for line in reader:
+        url_list.append(line.strip('\n'))
+
+print(url_list)
