@@ -50,7 +50,8 @@ class Scanner:
             self.result[url]["ipv4_addresses"] = self.ipv4_addresses(url)
             self.result[url]["ipv6_addresses"] = self.ipv6_addresses(url)
         with open(self.output_json, 'w') as writer:
-            json.dump(self.result, writer, sort_keys=True, indent = 4)
+            # print(self.result)
+            json.dump(self.result, writer, sort_keys=False, indent=4)
 
     def scan_time(self):
         return time.time()
@@ -62,8 +63,8 @@ class Scanner:
         idx = 0
         addr_list = []
         for sub in temp:
-            if sub.startswith("Addresses"):
-                addr_list = temp[idx:]
+            if sub.startswith("Name"):
+                addr_list = temp[idx+1:]
                 break
             idx += 1
 
@@ -80,8 +81,8 @@ class Scanner:
         idx = 0
         addr_list = []
         for sub in temp:
-            if sub.startswith("Addresses"):
-                addr_list = temp[idx:]
+            if sub.startswith("Name"):
+                addr_list = temp[idx+1:]
                 break
             idx += 1
         ipv6_list = []
