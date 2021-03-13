@@ -1,86 +1,165 @@
 {
-    "amazon.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "asee.org": {
-        "scan_time": 1615541228.1321445
-    },
-    "auditoryneuroscience.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "clocktab.com": {
-        "scan_time": 1615541228.1321445
+    "youtube.com": {
+        "scan_time": 1615629467.8884099,
+        "ipv4_addresses": []
     },
     "en.wikipedia.org": {
-        "scan_time": 1615541228.1321445
-    },
-    "facebook.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "fandom.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "gradeinflation.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "illinois.edu": {
-        "scan_time": 1615541228.1321445
-    },
-    "imdb.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "instagram.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "it.eecs.northwestern.edu": {
-        "scan_time": 1615541228.1321445
-    },
-    "kellogg.northwestern.edu": {
-        "scan_time": 1615541228.1321445
-    },
-    "kli.org": {
-        "scan_time": 1615541228.1321445
-    },
-    "mccormick.northwestern.edu": {
-        "scan_time": 1615541228.1321445
-    },
-    "northwestern.edu": {
-        "scan_time": 1615541228.1321445
-    },
-    "pinterest.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "pmichaud.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "reddit.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "spacejam.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "stevetarzia.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "tripadvisor.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615629468.0189211,
+        "ipv4_addresses": []
     },
     "twitter.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615629468.1120553,
+        "ipv4_addresses": [
+            "104.244.42.193",
+            "104.244.42.1"
+        ]
     },
-    "uchicago.edu": {
-        "scan_time": 1615541228.1321445
+    "facebook.com": {
+        "scan_time": 1615629468.2086449,
+        "ipv4_addresses": []
     },
-    "users.cs.northwestern.edu": {
-        "scan_time": 1615541228.1321445
-    },
-    "walmart.com": {
-        "scan_time": 1615541228.1321445
+    "amazon.com": {
+        "scan_time": 1615629468.304651,
+        "ipv4_addresses": [
+            "54.239.28.85",
+            "205.251.242.103",
+            "176.32.103.205"
+        ]
     },
     "yelp.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615629468.398411,
+        "ipv4_addresses": []
     },
-    "youtube.com": {
-        "scan_time": 1615541228.1321445
+    "reddit.com": {
+        "scan_time": 1615629468.4996862,
+        "ipv4_addresses": [
+            "151.101.65.140",
+            "151.101.193.140",
+            "151.101.129.140",
+            "151.101.1.140"
+        ]
+    },
+    "imdb.com": {
+        "scan_time": 1615629468.6184106,
+        "ipv4_addresses": [
+            "52.94.228.167",
+            "52.94.225.248",
+            "52.94.237.74"
+        ]
+    },
+    "fandom.com": {
+        "scan_time": 1615629468.7157688,
+        "ipv4_addresses": [
+            "151.101.128.194",
+            "151.101.64.194",
+            "151.101.0.194",
+            "151.101.192.194"
+        ]
+    },
+    "pinterest.com": {
+        "scan_time": 1615629468.8384428,
+        "ipv4_addresses": [
+            "151.101.0.84",
+            "151.101.192.84",
+            "151.101.64.84",
+            "151.101.128.84"
+        ]
+    },
+    "tripadvisor.com": {
+        "scan_time": 1615629468.9346957,
+        "ipv4_addresses": [
+            "192.229.162.112",
+            "192.229.189.15",
+            "192.229.182.112"
+        ]
+    },
+    "instagram.com": {
+        "scan_time": 1615629469.0304441,
+        "ipv4_addresses": [
+            "3.226.67.47",
+            "54.224.32.249",
+            "3.215.107.61",
+            "52.86.38.128",
+            "34.224.11.145",
+            "35.153.11.244",
+            "34.226.118.112",
+            "3.211.231.139"
+        ]
+    },
+    "walmart.com": {
+        "scan_time": 1615629469.1271813,
+        "ipv4_addresses": [
+            "161.170.232.170",
+            "161.170.230.170"
+        ]
+    },
+    "northwestern.edu": {
+        "scan_time": 1615629469.2303731,
+        "ipv4_addresses": []
+    },
+    "mccormick.northwestern.edu": {
+        "scan_time": 1615629469.3520846,
+        "ipv4_addresses": []
+    },
+    "kellogg.northwestern.edu": {
+        "scan_time": 1615629469.4473567,
+        "ipv4_addresses": []
+    },
+    "users.cs.northwestern.edu": {
+        "scan_time": 1615629469.5430708,
+        "ipv4_addresses": []
+    },
+    "it.eecs.northwestern.edu": {
+        "scan_time": 1615629469.6464896,
+        "ipv4_addresses": []
+    },
+    "uchicago.edu": {
+        "scan_time": 1615629469.7449188,
+        "ipv4_addresses": []
+    },
+    "illinois.edu": {
+        "scan_time": 1615629469.844249,
+        "ipv4_addresses": []
+    },
+    "stevetarzia.com": {
+        "scan_time": 1615629469.9447048,
+        "ipv4_addresses": []
+    },
+    "clocktab.com": {
+        "scan_time": 1615629470.0800478,
+        "ipv4_addresses": [
+            "104.21.35.119",
+            "172.67.220.24"
+        ]
+    },
+    "auditoryneuroscience.com": {
+        "scan_time": 1615629470.180787,
+        "ipv4_addresses": []
+    },
+    "asee.org": {
+        "scan_time": 1615629470.2776995,
+        "ipv4_addresses": []
+    },
+    "gradeinflation.com": {
+        "scan_time": 1615629470.5637708,
+        "ipv4_addresses": []
+    },
+    "spacejam.com": {
+        "scan_time": 1615629470.693681,
+        "ipv4_addresses": [
+            "99.83.180.228",
+            "75.2.104.223"
+        ]
+    },
+    "pmichaud.com": {
+        "scan_time": 1615629470.9330864,
+        "ipv4_addresses": []
+    },
+    "kli.org": {
+        "scan_time": 1615629471.0733023,
+        "ipv4_addresses": [
+            "172.67.202.249",
+            "104.21.22.57"
+        ]
     }
 }
