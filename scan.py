@@ -15,6 +15,8 @@ import json
 import sys  # necessary for sys.argv
 import subprocess
 
+import requests # Necessary for Http_server parts
+
 
 
 
@@ -49,6 +51,7 @@ class Scanner:
             self.result[url]["scan_time"] = self.scan_time()
             self.result[url]["ipv4_addresses"] = self.ipv4_addresses(url)
             self.result[url]["ipv6_addresses"] = self.ipv6_addresses(url)
+            self.result[url]["http_server"] = self.http_server(url)
         with open(self.output_json, 'w') as writer:
             # print(self.result)
             json.dump(self.result, writer, sort_keys=False, indent=4)
@@ -109,7 +112,16 @@ class Scanner:
 
 
 
-
+    def http_server(self, url):
+        # utilize requests to GET data from http
+        site = "http://" + url
+        r = requests.get(site)
+        print(r)
+        if 'server' not in r.headers:
+            server_name = None
+        else:
+            server_name = r.headers['server']
+        return server_name
 
 
     """ 
