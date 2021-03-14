@@ -1,86 +1,47 @@
 {
-    "amazon.com": {
-        "scan_time": 1615541228.1321445
-    },
     "asee.org": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771752
     },
     "auditoryneuroscience.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.477174
     },
     "clocktab.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "en.wikipedia.org": {
-        "scan_time": 1615541228.1321445
-    },
-    "facebook.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "fandom.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771736
     },
     "gradeinflation.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771757
     },
     "illinois.edu": {
-        "scan_time": 1615541228.1321445
-    },
-    "imdb.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "instagram.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.477168
     },
     "it.eecs.northwestern.edu": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771664
     },
     "kellogg.northwestern.edu": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771652
     },
     "kli.org": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771774
     },
     "mccormick.northwestern.edu": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771647
     },
     "northwestern.edu": {
-        "scan_time": 1615541228.1321445
-    },
-    "pinterest.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771636
     },
     "pmichaud.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "reddit.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.477177
     },
     "spacejam.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771764
     },
     "stevetarzia.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "tripadvisor.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "twitter.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771729
     },
     "uchicago.edu": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771674
     },
     "users.cs.northwestern.edu": {
-        "scan_time": 1615541228.1321445
-    },
-    "walmart.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "yelp.com": {
-        "scan_time": 1615541228.1321445
-    },
-    "youtube.com": {
-        "scan_time": 1615541228.1321445
+        "scan_time": 1615763891.4771662
     }
 }
