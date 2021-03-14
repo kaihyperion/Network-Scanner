@@ -52,6 +52,7 @@ class Scanner:
             self.result[url]["ipv4_addresses"] = self.ipv4_addresses(url)
             self.result[url]["ipv6_addresses"] = self.ipv6_addresses(url)
             self.result[url]["http_server"] = self.http_server(url)
+            self.result[url]["insecure_http"] = self.insecure_http(url)
         with open(self.output_json, 'w') as writer:
             # print(self.result)
             json.dump(self.result, writer, sort_keys=False, indent=4)
@@ -110,13 +111,11 @@ class Scanner:
     #     completed.stdout.decode('utf-8', errors='ignore').split()
     #     temp.stdout.splitlines()
 
-
-
     def http_server(self, url):
         # utilize requests to GET data from http
         site = "http://" + url
         r = requests.get(site)
-        print(r)
+
         if 'server' not in r.headers:
             server_name = None
         else:
@@ -124,12 +123,16 @@ class Scanner:
         return server_name
 
 
-    """ 
-        {url1 : {"scan"_time":1231, "ipv4_addresses":12123...}
-         url2 : {}...
-    """
-
-
+    def insecure_http(self, url):
+        insecure_flag = False
+        site = "http://" + url +":80"
+        r = requests.get(site)
+        print(r)
+        if r.status_code == 200:
+            insecure_flag = True
+        return insecure_flag
+    
+    
 
 
 # It's key should be the domain that were scanned and the values are dictionaries with
