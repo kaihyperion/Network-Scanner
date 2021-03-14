@@ -16,6 +16,7 @@ import sys  # necessary for sys.argv
 import subprocess
 
 import requests # Necessary for Http_server parts
+import itertools
 
 
 
@@ -37,6 +38,9 @@ class Scanner:
         #Create a nested dictionary
         self.result = {}
 
+        # Session(): learned from requests.readthedocs.io/en/master/user/advanced/
+        self.requestor = requests.Session()
+
         scanner_tool = ["scan_time", "ipv4_addresses"]
 
         # parse through txt file and put url into list.
@@ -45,7 +49,7 @@ class Scanner:
 
                 self.url_list.append(url.strip('\n'))
 
-
+        list_tls = ["TLSv1.0", "TLSv1.1", "TLSv1.2", "TLSv1.3"]
         for url in self.url_list:
             self.result[url]={}
             self.result[url]["scan_time"] = self.scan_time()
@@ -53,6 +57,9 @@ class Scanner:
             self.result[url]["ipv6_addresses"] = self.ipv6_addresses(url)
             self.result[url]["http_server"] = self.http_server(url)
             self.result[url]["insecure_http"] = self.insecure_http(url)
+            #self.result[url]["redirect_https"] = self.redirect_to_https(url)
+            self.result[url]["tls_versions"] = list(itertools.compress(list_tls, selectors=self.tls_version(url)))
+
         with open(self.output_json, 'w') as writer:
             # print(self.result)
             json.dump(self.result, writer, sort_keys=False, indent=4)
@@ -61,7 +68,7 @@ class Scanner:
         return time.time()
 
     def ipv4_addresses(self, url):
-        completed = subprocess.run(['nslookup', '-type=A', url], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        completed = subprocess.run(['nslookup', '-type=A', url], timeout = 2, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         temp = completed.stdout.decode('utf-8', errors='ignore').splitlines()
         # Extract the index where it shows Addresses
         idx = 0
@@ -79,7 +86,7 @@ class Scanner:
         return ipv4_list
 
     def ipv6_addresses(self, url):
-        completed = subprocess.run(['nslookup', '-type=AAAA', url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        completed = subprocess.run(['nslookup', '-type=AAAA', url], timeout = 2,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         temp = completed.stdout.decode('utf-8', errors='ignore').splitlines()
 
         idx = 0
@@ -114,7 +121,7 @@ class Scanner:
     def http_server(self, url):
         # utilize requests to GET data from http
         site = "http://" + url
-        r = requests.get(site)
+        r = self.requestor.get(site, timeout=2)
 
         if 'server' not in r.headers:
             server_name = None
@@ -126,19 +133,63 @@ class Scanner:
     def insecure_http(self, url):
         insecure_flag = False
         site = "http://" + url +":80"
-        r = requests.get(site)
+        r = self.requestor.get(site, timeout=2)
         print(r)
         if r.status_code == 200:
             insecure_flag = True
         return insecure_flag
-    
-    
+
+# """
+# Redirect to https:
+# - Redirect responses have status codes that start with 3
+# - Location header holding the URL to redirect to
+# - By using Request.Session() We can explicitly specify the count of max_redirect
+# src: stackoverflow.com/questions/23651947/python-requests-requests-exceptions-toomanyredirects-exceeded-30-redirects
+# documentation: requests.readthedocs.io/en/master/
+# """
+#     def redirect_to_https(self, url):
+#         self.requestor.max_redirect = 10    # Thi sets the Max num of redirect allowed. if passed, toomanyredirects exception is raised.
+#         site = "http://"+url
+#         a = False
+#
+#         while True:
+#             try:
+#                 r = self.requestor.get(site, timeout=2)
+#                 if r.url.startswith("https//"):
+#                     a = True #checker for https redirect bool
+#                     return a
+#             except requests.exceptions.TooManyRedirects and requests.exceptions.ConnectTimeout:
+#                 a = False
+#                 return a
+#
 
 
-# It's key should be the domain that were scanned and the values are dictionaries with
-# scanned results.
+    def tls_version(self, url):
+        port_num = 443
+        result = subprocess.run(["nmap","--script","ssl-enum-ciphers","-p","443",url], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8').split()
+        list_of_tls = ["TLSv1.0:", "TLSv1.1:","TLSv1.2:"]
+        bool_result = []
 
-#Create nested dictionary. programiz.com/python-programming/nested-dictionary
+        # check which of TLSv1.0-1.2 is in the nmapped of url
+        for i in list_of_tls:
+            bool_result.append(i in result)    # should return a bool mask showing T/F for each value
+
+        #output = list(itertools.compress(list_of_tls, mask))
+
+        # We need to check if it can support TLSv1.3
+        # nmap doesn't support TLSv1.3
+        result = subprocess.run(["openssl","s_client","-tls1_3","-connect", url+":443"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out = result.stdout.decode('utf-8').split()
+        bool_result.append("TLSv1.3" in out) #This should add true or false for tlsv1.3
+
+        return bool_result  # Returns a list of boolean
+
+
+
+
+
+
+
 
 
 main = Scanner(sys.argv[1], sys.argv[2])
