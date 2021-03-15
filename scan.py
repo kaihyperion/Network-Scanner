@@ -59,6 +59,7 @@ class Scanner:
             self.result[url]["insecure_http"] = self.insecure_http(url)
             #self.result[url]["redirect_https"] = self.redirect_to_https(url)
             self.result[url]["tls_versions"] = list(itertools.compress(list_tls, selectors=self.tls_version(url)))
+            self.result[url]["root_ca"] = self.root_ca(url)
 
         with open(self.output_json, 'w') as writer:
             # print(self.result)
@@ -183,6 +184,16 @@ class Scanner:
         bool_result.append("TLSv1.3" in out) #This should add true or false for tlsv1.3
 
         return bool_result  # Returns a list of boolean
+
+    # List the root CA at the base of the chain of trust for validating this server's public key.
+    # Just list the "organization name" (found under'O") - Can be found using openssl
+    def root_ca(self, url):
+        port_num = 443
+        result = subprocess.run(["openssl","s_client", "-connect",url+":"+port_num], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out = result.stdout.decode('utf-8').split("O = ")[1]
+        out = out.split(", CN")[0]
+        return out
+
 
 
 
