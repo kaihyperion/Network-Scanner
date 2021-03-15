@@ -13,6 +13,11 @@ scan_time, ipv4_addresses, ipv6_addresses, and http_server
 import time
 import json
 import sys  # necessary for sys.argv
+import subprocess
+
+import requests # Necessary for Http_server parts
+
+
 
 
 """
@@ -32,30 +37,111 @@ class Scanner:
         #Create a nested dictionary
         self.result = {}
 
+        scanner_tool = ["scan_time", "ipv4_addresses"]
+
         # parse through txt file and put url into list.
         with open(self.filename, 'r') as url_reader:
-            for line in url_reader:
+            for url in url_reader:
 
-                self.url_list.append(line.strip('\n'))
-
+                self.url_list.append(url.strip('\n'))
 
 
         for url in self.url_list:
             self.result[url]={}
             self.result[url]["scan_time"] = self.scan_time()
+            self.result[url]["ipv4_addresses"] = self.ipv4_addresses(url)
+            self.result[url]["ipv6_addresses"] = self.ipv6_addresses(url)
+            self.result[url]["http_server"] = self.http_server(url)
+            self.result[url]["insecure_http"] = self.insecure_http(url)
+            self.result[url]["redirect_to_https"] = self.https_redirect(url)
         with open(self.output_json, 'w') as writer:
-            json.dump(self.result, writer, sort_keys=True, indent = 4)
+            # print(self.result)
+            json.dump(self.result, writer, sort_keys=False, indent=4)
 
     def scan_time(self):
         return time.time()
 
+    def ipv4_addresses(self, url):
+        completed = subprocess.run(['nslookup', '-type=A', url], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        temp = completed.stdout.decode('utf-8', errors='ignore').splitlines()
+        # Extract the index where it shows Addresses
+        idx = 0
+        addr_list = []
+        for sub in temp:
+            if sub.startswith("Name"):
+                addr_list = temp[idx+1:]
+                break
+            idx += 1
 
-    """ 
-        {url1 : {"scan"_time":1231, "ipv4_addresses":12123...}
-         url2 : {}...
-    """
+        ipv4_list = []
+        for i in addr_list:
+            if len(i.split()) != 0:
+                ipv4_list.append(i.split()[-1])
+        return ipv4_list
+
+    def ipv6_addresses(self, url):
+        completed = subprocess.run(['nslookup', '-type=AAAA', url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        temp = completed.stdout.decode('utf-8', errors='ignore').splitlines()
+
+        idx = 0
+        addr_list = []
+        for sub in temp:
+            if sub.startswith("Name"):
+                addr_list = temp[idx+1:]
+                break
+            idx += 1
+        ipv6_list = []
+        for i in addr_list:
+            if len(i.split()) != 0:
+                ipv6_list.append(i.split()[-1])
+        return ipv6_list
 
 
+    # def nslookup(self, url, type):
+    #     output = {}
+    #     type_dict = {'ipv4': '-type=A',
+    #                  'ipv6': '-type=AAAA'}
+    #
+    #     completed = subprocess.run(["nslookup", type_dict[type],  url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #     for line in completed.stdout.decode('utf-8', errors='ignore').splitlines():
+    #         partition = line.split()
+    #         if len(partition) >= 2:
+    #             if token[0] == 'Address:':
+    #                 output
+    #             output[token[0].rstrip(":")] = token[1]
+    #     completed.stdout.decode('utf-8', errors='ignore').split()
+    #     temp.stdout.splitlines()
+
+    def http_server(self, url):
+        # utilize requests to GET data from http
+        site = "http://" + url
+        r = requests.get(site)
+
+        if 'server' not in r.headers:
+            server_name = None
+        else:
+            server_name = r.headers['server']
+        return server_name
+
+    def insecure_http(self, url):
+        insecure_flag = False
+        site = "http://" + url +":80"
+        r = requests.get(site)
+        if r.status_code == 200:
+            insecure_flag = True
+        return insecure_flag
+
+    def https_redirect(self, url):
+        redirect_flag = False
+        site ="http://" + url + ":80"
+        r = requests.get(site)
+        if len(r.history) > 0:
+            if r.url[0:8] == "https://":
+                redirect_flag = True
+        return redirect_flag
+
+    
+    
 
 
 # It's key should be the domain that were scanned and the values are dictionaries with
