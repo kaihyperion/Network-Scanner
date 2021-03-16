@@ -54,12 +54,14 @@ class Scanner:
             self.result[url]={}
             self.result[url]["scan_time"] = self.scan_time()
             self.result[url]["ipv4_addresses"] = self.ipv4_addresses(url)
-            self.result[url]["ipv6_addresses"] = self.ipv6_addresses(url)
-            self.result[url]["http_server"] = self.http_server(url)
-            self.result[url]["insecure_http"] = self.insecure_http(url)
+            #self.result[url]["ipv6_addresses"] = self.ipv6_addresses(url)
+            #self.result[url]["http_server"] = self.http_server(url)
+            #self.result[url]["insecure_http"] = self.insecure_http(url)
             #self.result[url]["redirect_https"] = self.redirect_to_https(url)
-            self.result[url]["tls_versions"] = list(itertools.compress(list_tls, selectors=self.tls_version(url)))
-            self.result[url]["root_ca"] = self.root_ca(url)
+            #self.result[url]["tls_versions"] = list(itertools.compress(list_tls, selectors=self.tls_version(url)))
+            #self.result[url]["root_ca"] = self.root_ca(url)
+            for ipv4 in self.result[url]["ipv4_addresses"]:
+                self.result[url]["rdns_names"] = self.rdns_names(ipv4)
 
         with open(self.output_json, 'w') as writer:
             # print(self.result)
@@ -167,7 +169,7 @@ class Scanner:
 
     def tls_version(self, url):
         port_num = 443
-        result = subprocess.run(["nmap","--script","ssl-enum-ciphers","-p","443",url], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8').split()
+        result = subprocess.run(["nmap","--script","ssl-enum-ciphers","-p","443",url], timeout = 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8').split()
         list_of_tls = ["TLSv1.0:", "TLSv1.1:","TLSv1.2:"]
         bool_result = []
 
@@ -179,7 +181,7 @@ class Scanner:
 
         # We need to check if it can support TLSv1.3
         # nmap doesn't support TLSv1.3
-        result = subprocess.run(["openssl","s_client","-tls1_3","-connect", url+":443"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(["openssl","s_client","-tls1_3","-connect", url+":443"],timeout= 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out = result.stdout.decode('utf-8').split()
         bool_result.append("TLSv1.3" in out) #This should add true or false for tlsv1.3
 
@@ -189,10 +191,20 @@ class Scanner:
     # Just list the "organization name" (found under'O") - Can be found using openssl
     def root_ca(self, url):
         port_num = 443
-        result = subprocess.run(["openssl","s_client", "-connect",url+":"+port_num], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(["openssl","s_client", "-connect",url+":"+port_num], timeout=2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out = result.stdout.decode('utf-8').split("O = ")[1]
         out = out.split(", CN")[0]
         return out
+
+    def rdns_names(self, ipv4):
+        result = subprocess.run(["nslookup", "-type=PTR", ipv4], timeout = 2, stdout = subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
+        result = result.splitlines()
+        rdns_list = []
+        for i in result:
+            if "name = " in i:
+                output = i.split('name = ')[1].strip(' \t\r\n')
+                rdns_list.append(output)
+        return rdns_list
 
 
 

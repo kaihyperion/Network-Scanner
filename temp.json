@@ -1,147 +1,139 @@
 {
     "northwestern.edu": {
-        "scan_time": 1615700524.5716124,
+        "scan_time": 1615774095.7159739,
         "ipv4_addresses": [
             "129.105.136.48"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache",
-        "insecure_http": true
+        "rdns_names": [
+            "evcommon-caesar-vip.northwestern.edu",
+            "cnair.northwestern.edu"
+        ]
     },
     "mccormick.northwestern.edu": {
-        "scan_time": 1615700525.202927,
+        "scan_time": 1615774095.9404175,
         "ipv4_addresses": [
             "129.105.1.129"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache/2.4.7 (Ubuntu)",
-        "insecure_http": true
+        "rdns_names": [
+            "mccormick.northwestern.edu"
+        ]
     },
     "kellogg.northwestern.edu": {
-        "scan_time": 1615700525.638772,
+        "scan_time": 1615774096.252085,
         "ipv4_addresses": [
             "165.124.147.150"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Microsoft-IIS/10.0",
-        "insecure_http": true
+        "rdns_names": [
+            "kellogg.northwestern.edu",
+            "kelloggalumni.kellogg.northwestern.edu"
+        ]
     },
     "users.cs.northwestern.edu": {
-        "scan_time": 1615700526.2930791,
+        "scan_time": 1615774096.531093,
         "ipv4_addresses": [
             "165.124.180.20",
             "users.cs.northwestern.edu"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache",
-        "insecure_http": true
+        "rdns_names": [
+            "web1.cs.northwestern.edu"
+        ]
     },
     "it.eecs.northwestern.edu": {
-        "scan_time": 1615700526.6421878,
+        "scan_time": 1615774096.8367038,
         "ipv4_addresses": [
             "129.105.8.2"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache",
-        "insecure_http": true
+        "rdns_names": [
+            "it.ece.northwestern.edu"
+        ]
     },
     "uchicago.edu": {
-        "scan_time": 1615700526.9254298,
+        "scan_time": 1615774097.1182516,
         "ipv4_addresses": [
             "34.200.129.209"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache",
-        "insecure_http": true
+        "rdns_names": [
+            "ec2-34-200-129-209.compute-1.amazonaws.com"
+        ]
     },
     "illinois.edu": {
-        "scan_time": 1615700527.620228,
+        "scan_time": 1615774097.3191464,
         "ipv4_addresses": [
             "192.17.172.3"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache/2.2.15 (Red Hat) mod_ssl/2.2.15 OpenSSL/1.0.1e-fips",
-        "insecure_http": true
+        "rdns_names": [
+            "tardis.techservices.illinois.edu"
+        ]
     },
     "stevetarzia.com": {
-        "scan_time": 1615700528.0170062,
+        "scan_time": 1615774097.61952,
         "ipv4_addresses": [
             "54.245.121.172"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache/2.2.34 (Amazon)",
-        "insecure_http": true
+        "rdns_names": [
+            "grits.stevetarzia.com"
+        ]
     },
     "clocktab.com": {
-        "scan_time": 1615700529.082162,
+        "scan_time": 1615774097.8796084,
         "ipv4_addresses": [
             "172.67.220.24",
             "104.21.35.119"
         ],
-        "ipv6_addresses": [
-            "2606:4700:3036::ac43:dc18",
-            "2606:4700:3030::6815:2377"
-        ],
-        "http_server": "cloudflare",
-        "insecure_http": true
+        "rdns_names": []
     },
     "auditoryneuroscience.com": {
-        "scan_time": 1615700529.5275207,
+        "scan_time": 1615774098.2561638,
         "ipv4_addresses": [
             "144.214.26.111"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache/2.4.29 (Ubuntu)",
-        "insecure_http": true
+        "rdns_names": [
+            "twinkle.bms.cityu.edu.hk"
+        ]
     },
     "asee.org": {
-        "scan_time": 1615700530.4142094,
+        "scan_time": 1615774098.7819505,
         "ipv4_addresses": [
             "216.185.13.131"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache/2.4.7 (Ubuntu)",
-        "insecure_http": true
+        "rdns_names": [
+            "216-185-13-131.i95.net"
+        ]
     },
     "gradeinflation.com": {
-        "scan_time": 1615700534.7878218,
+        "scan_time": 1615774099.1245263,
         "ipv4_addresses": [
             "66.70.176.24"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache",
-        "insecure_http": true
+        "rdns_names": [
+            "ahs4.r4l.com"
+        ]
     },
     "spacejam.com": {
-        "scan_time": 1615700535.4431174,
+        "scan_time": 1615774099.5427048,
         "ipv4_addresses": [
-            "75.2.104.223",
-            "99.83.180.228"
+            "99.83.180.228",
+            "75.2.104.223"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache/2.4.43 () OpenSSL/1.0.2k-fips",
-        "insecure_http": true
+        "rdns_names": [
+            "a259cf76d74e1f65f.awsglobalaccelerator.com"
+        ]
     },
     "pmichaud.com": {
-        "scan_time": 1615700535.9902122,
+        "scan_time": 1615774099.9470599,
         "ipv4_addresses": [
             "23.254.203.248"
         ],
-        "ipv6_addresses": [],
-        "http_server": "Apache",
-        "insecure_http": true
+        "rdns_names": [
+            "hwsrv-233708.hostwindsdns.com"
+        ]
     },
     "kli.org": {
-        "scan_time": 1615700536.692335,
+        "scan_time": 1615774100.3114123,
         "ipv4_addresses": [
             "172.67.202.249",
             "104.21.22.57"
         ],
-        "ipv6_addresses": [
-            "2606:4700:3032::6815:1639",
-            "2606:4700:3033::ac43:caf9"
-        ],
-        "http_server": "cloudflare",
-        "insecure_http": true
+        "rdns_names": []
     }
 }
