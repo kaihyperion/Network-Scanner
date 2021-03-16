@@ -7,7 +7,7 @@ list of domains to test. you can test with the following files, and also write y
 need to output 4 scan results:
 scan_time, ipv4_addresses, ipv6_addresses, and http_server
 """
-
+### WORKING COPY ###
 import time
 import json
 import sys  # necessary for sys.argv
@@ -54,8 +54,10 @@ class Scanner:
             self.result[url]["insecure_http"] = self.insecure_http(url)
             self.result[url]["redirect_to_https"] = self.https_redirect(url)
             self.result[url]["hsts"] = self.hsts(url)
-            self.result[url]["tls_versions"] = list(itertools.compress(list_tls, selectors=self.tls_version(url)))
-            self.result[url]["root_ca"] = self.root_ca(url)
+            #self.result[url]["tls_versions"] = list(itertools.compress(list_tls, selectors=self.tls_version(url)))
+            #self.result[url]["root_ca"] = self.root_ca(url)
+            #for ipv4 in self.result[url]["ipv4_addresses"]:
+                #self.result[url]["rdns_names"] = self.rdns_names(ipv4)
 
         with open(self.output_json, 'w') as writer:
             json.dump(self.result, writer, sort_keys=False, indent=4)
@@ -82,8 +84,8 @@ class Scanner:
                     if len(i.split()) != 0:
                         ipv4_list.append(i.split()[-1])
                 return ipv4_list
-            except requests.exceptions.Timeout:
-                print("timeout in ipv4 lookup", url)
+            except:
+                print("error or timeout in ipv4 lookup", url)
                 return None
 
 
@@ -106,8 +108,8 @@ class Scanner:
                     if len(i.split()) != 0:
                         ipv6_list.append(i.split()[-1])
                 return ipv6_list
-            except requests.exceptions.Timeout:
-                print("timeout in ipv6 lookup", url)
+            except:
+                print("error or timeout in ipv6 lookup", url)
                 return None
 
 
@@ -123,8 +125,8 @@ class Scanner:
                 else:
                     server_name = r.headers['server']
                 return server_name
-            except requests.exceptions.Timeout:
-                print("timeout in http_server", url)
+            except:
+                print("error or timeout in http_server", url)
                 return None
 
 
@@ -138,13 +140,14 @@ class Scanner:
                 if r.status_code == 200:
                     insecure_flag = True
                 return insecure_flag
-            except requests.exceptions.Timeout:
-                print("timeout in insecure_http", url)
+            except:
+                print("error or timeout in insecure_http", url)
                 return None
 
 
 
     def https_redirect(self, url):
+        redirect_flag = False
         site = "http://" + url +":80"
         self.requestor.max_redirects = 10
 
@@ -152,11 +155,10 @@ class Scanner:
             try:
                 r = self.requestor.get(site, timeout = self.timeout)
                 if len(r.history) > 0 and r.url[0:8] == "https://":
-                    return True
-                else:
-                    return False
-            except requests.exceptions.TooManyRedirects or requests.exceptions.Timeout:
-                print("error in https_redirect", url)
+                    redirect_flag = True
+                return redirect_flag
+            except:
+                print("error or timeout in https_redirect", url)
                 return None
 
     def hsts(self, url):
@@ -169,13 +171,13 @@ class Scanner:
                 if 'Strict-Transport-Security' in r.headers and r.url[0:8] == "https://":
                     hsts_flag = True
                 return hsts_flag
-            except requests.exceptions.Timeout:
-                print("timeout in hsts", url)
+            except:
+                print("error or timeout in hsts", url)
                 return None
 
     def tls_version(self, url):
         port_num = 443
-        result = subprocess.run(["nmap","--script","ssl-enum-ciphers","-p","443",url], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8').split()
+        result = subprocess.run(["nmap","--script","ssl-enum-ciphers","-p","443",url], timeout = 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8').split()
         list_of_tls = ["TLSv1.0:", "TLSv1.1:","TLSv1.2:"]
         bool_result = []
 
@@ -187,7 +189,7 @@ class Scanner:
 
         # We need to check if it can support TLSv1.3
         # nmap doesn't support TLSv1.3
-        result = subprocess.run(["openssl","s_client","-tls1_3","-connect", url+":443"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(["openssl","s_client","-tls1_3","-connect", url+":443"],timeout= 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out = result.stdout.decode('utf-8').split()
         bool_result.append("TLSv1.3" in out) #This should add true or false for tlsv1.3
 
@@ -197,10 +199,21 @@ class Scanner:
     # Just list the "organization name" (found under'O") - Can be found using openssl
     def root_ca(self, url):
         port_num = 443
-        result = subprocess.run(["openssl","s_client", "-connect",url+":"+port_num], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(["openssl","s_client", "-connect",url+":"+port_num], timeout=2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out = result.stdout.decode('utf-8').split("O = ")[1]
         out = out.split(", CN")[0]
         return out
+
+    def rdns_names(self, ipv4):
+        result = subprocess.run(["nslookup", "-type=PTR", ipv4], timeout = 2, stdout = subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
+        result = result.splitlines()
+        rdns_list = []
+        for i in result:
+            if "name = " in i:
+                output = i.split('name = ')[1].strip(' \t\r\n')
+                rdns_list.append(output)
+        return rdns_list
+
 
 
 
