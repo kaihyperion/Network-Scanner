@@ -1,19 +1,22 @@
 {
     "youtube.com": {
-        "scan_time": 1615932469.187716,
+        "scan_time": 1615933625.67755,
         "ipv4_addresses": [
-            "172.217.9.46"
+            "142.250.80.14"
         ],
         "ipv6_addresses": [
-            "2607:f8b0:4006:80a::200e"
+            "2607:f8b0:4009:806::200e"
         ],
         "http_server": "ESF",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": true
+        "hsts": true,
+        "rdns_names": [
+            "lga34s33-in-f14.1e100.net"
+        ]
     },
     "en.wikipedia.org": {
-        "scan_time": 1615932471.95421,
+        "scan_time": 1615933629.7368562,
         "ipv4_addresses": [
             "208.80.154.224",
             "en.wikipedia.org"
@@ -22,24 +25,29 @@
             "2620:0:861:ed1a::1",
             "en.wikipedia.org"
         ],
-        "http_server": "mw1384.eqiad.wmnet",
+        "http_server": "mw1350.eqiad.wmnet",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": true
+        "hsts": true,
+        "rdns_names": [
+            "dyna.wikimedia.org"
+        ]
     },
     "twitter.com": {
-        "scan_time": 1615932472.7650895,
+        "scan_time": 1615933630.8911135,
         "ipv4_addresses": [
-            "104.244.42.193"
+            "104.244.42.193",
+            "104.244.42.65"
         ],
         "ipv6_addresses": [],
         "http_server": "tsa_b",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": true
+        "hsts": true,
+        "rdns_names": []
     },
     "facebook.com": {
-        "scan_time": 1615932473.9038422,
+        "scan_time": 1615933632.404257,
         "ipv4_addresses": [
             "157.240.18.35"
         ],
@@ -49,23 +57,27 @@
         "http_server": null,
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": true
+        "hsts": true,
+        "rdns_names": [
+            "edge-star-mini-shv-02-ort2.facebook.com"
+        ]
     },
     "amazon.com": {
-        "scan_time": 1615932475.0428298,
+        "scan_time": 1615933633.8566177,
         "ipv4_addresses": [
-            "54.239.28.85",
             "176.32.103.205",
-            "205.251.242.103"
+            "205.251.242.103",
+            "54.239.28.85"
         ],
         "ipv6_addresses": [],
         "http_server": "Server",
         "insecure_http": false,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": []
     },
     "yelp.com": {
-        "scan_time": 1615932477.9416227,
+        "scan_time": 1615933635.2967327,
         "ipv4_addresses": [
             "199.232.76.116"
         ],
@@ -73,24 +85,26 @@
         "http_server": "envoy",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": true
+        "hsts": true,
+        "rdns_names": []
     },
     "reddit.com": {
-        "scan_time": 1615932482.2256546,
+        "scan_time": 1615933639.4967687,
         "ipv4_addresses": [
-            "151.101.1.140",
             "151.101.193.140",
             "151.101.65.140",
+            "151.101.1.140",
             "151.101.129.140"
         ],
         "ipv6_addresses": [],
-        "http_server": "snooserv",
+        "http_server": null,
         "insecure_http": true,
-        "redirect_to_https": null,
-        "hsts": null
+        "redirect_to_https": true,
+        "hsts": true,
+        "rdns_names": []
     },
     "imdb.com": {
-        "scan_time": 1615932490.1735458,
+        "scan_time": 1615933649.154232,
         "ipv4_addresses": [
             "52.94.228.167",
             "52.94.237.74",
@@ -100,90 +114,98 @@
         "http_server": "Server",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": true
+        "hsts": true,
+        "rdns_names": []
     },
     "fandom.com": {
-        "scan_time": 1615932493.763339,
+        "scan_time": 1615933654.415873,
         "ipv4_addresses": [
+            "151.101.192.194",
             "151.101.64.194",
-            "151.101.0.194",
             "151.101.128.194",
-            "151.101.192.194"
+            "151.101.0.194"
         ],
         "ipv6_addresses": [],
         "http_server": null,
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": []
     },
     "pinterest.com": {
-        "scan_time": 1615932494.365259,
+        "scan_time": 1615933656.0411315,
         "ipv4_addresses": [
-            "151.101.128.84",
             "151.101.192.84",
-            "151.101.0.84",
-            "151.101.64.84"
+            "151.101.128.84",
+            "151.101.64.84",
+            "151.101.0.84"
         ],
         "ipv6_addresses": [],
         "http_server": null,
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": true
+        "hsts": true,
+        "rdns_names": []
     },
     "tripadvisor.com": {
-        "scan_time": 1615932495.6866045,
+        "scan_time": 1615933657.4937909,
         "ipv4_addresses": [
-            "192.229.189.15",
             "192.229.162.112",
-            "192.229.182.112"
+            "192.229.182.112",
+            "192.229.189.15"
         ],
         "ipv6_addresses": [],
         "http_server": "envoy",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": []
     },
     "instagram.com": {
-        "scan_time": 1615932503.0775971,
+        "scan_time": 1615933664.8320796,
         "ipv4_addresses": [
-            "3.219.38.54",
-            "54.175.173.127",
-            "3.221.198.91",
-            "3.85.199.59",
-            "3.211.190.38",
-            "34.239.39.134",
-            "3.223.93.237",
-            "52.0.212.144"
+            "52.207.75.153",
+            "3.210.218.45",
+            "3.208.131.236",
+            "3.213.18.164",
+            "35.172.187.47",
+            "3.211.123.255",
+            "184.72.136.14",
+            "54.210.252.14"
         ],
         "ipv6_addresses": [
-            "2406:da00:ff00::3d2:39c1",
-            "2406:da00:ff00::6b17:1850",
-            "2406:da00:ff00::3447:a7a3",
-            "2406:da00:ff00::3404:8691",
-            "2406:da00:ff00::3405:6c76",
-            "2406:da00:ff00::6418:688e",
-            "2406:da00:ff00::3d4:d309",
-            "2406:da00:ff00::35e:2da3"
+            "2406:da00:ff00::3d2:74d1",
+            "2406:da00:ff00::3d1:3cb9",
+            "2406:da00:ff00::22c9:d31b",
+            "2406:da00:ff00::3402:e47",
+            "2406:da00:ff00::3691:317b",
+            "2406:da00:ff00::23ad:39e",
+            "2406:da00:ff00::3405:dcf6",
+            "2406:da00:ff00::6b15:c53d"
         ],
         "http_server": null,
         "insecure_http": false,
         "redirect_to_https": true,
-        "hsts": true
+        "hsts": true,
+        "rdns_names": [
+            "ec2-54-210-252-14.compute-1.amazonaws.com"
+        ]
     },
     "walmart.com": {
-        "scan_time": 1615932504.901564,
+        "scan_time": 1615933670.5408843,
         "ipv4_addresses": [
-            "161.170.232.170",
-            "161.170.230.170"
+            "161.170.230.170",
+            "161.170.232.170"
         ],
         "ipv6_addresses": [],
         "http_server": null,
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": []
     },
     "northwestern.edu": {
-        "scan_time": 1615932506.6357477,
+        "scan_time": 1615933672.0966206,
         "ipv4_addresses": [
             "129.105.136.48"
         ],
@@ -191,10 +213,14 @@
         "http_server": "Apache",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": [
+            "cnair.northwestern.edu",
+            "evcommon-caesar-vip.northwestern.edu"
+        ]
     },
     "mccormick.northwestern.edu": {
-        "scan_time": 1615932510.4462197,
+        "scan_time": 1615933673.160352,
         "ipv4_addresses": [
             "129.105.1.129"
         ],
@@ -202,10 +228,13 @@
         "http_server": "Apache/2.4.7 (Ubuntu)",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": [
+            "mccormick.northwestern.edu"
+        ]
     },
     "kellogg.northwestern.edu": {
-        "scan_time": 1615932511.0233393,
+        "scan_time": 1615933673.9611025,
         "ipv4_addresses": [
             "165.124.147.150"
         ],
@@ -213,10 +242,14 @@
         "http_server": null,
         "insecure_http": null,
         "redirect_to_https": null,
-        "hsts": null
+        "hsts": null,
+        "rdns_names": [
+            "kellogg.northwestern.edu",
+            "kelloggalumni.kellogg.northwestern.edu"
+        ]
     },
     "users.cs.northwestern.edu": {
-        "scan_time": 1615932511.3541212,
+        "scan_time": 1615933674.3413246,
         "ipv4_addresses": [
             "165.124.180.20",
             "users.cs.northwestern.edu"
@@ -225,10 +258,13 @@
         "http_server": "Apache",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": [
+            "web1.cs.northwestern.edu"
+        ]
     },
     "it.eecs.northwestern.edu": {
-        "scan_time": 1615932511.7600796,
+        "scan_time": 1615933674.8966906,
         "ipv4_addresses": [
             "129.105.8.2"
         ],
@@ -236,10 +272,13 @@
         "http_server": "Apache",
         "insecure_http": true,
         "redirect_to_https": false,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": [
+            "it.ece.northwestern.edu"
+        ]
     },
     "uchicago.edu": {
-        "scan_time": 1615932512.0830493,
+        "scan_time": 1615933675.293786,
         "ipv4_addresses": [
             "34.200.129.209"
         ],
@@ -247,10 +286,13 @@
         "http_server": "Apache",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": [
+            "ec2-34-200-129-209.compute-1.amazonaws.com"
+        ]
     },
     "illinois.edu": {
-        "scan_time": 1615932513.2173154,
+        "scan_time": 1615933676.2942026,
         "ipv4_addresses": [
             "192.17.172.3"
         ],
@@ -258,10 +300,13 @@
         "http_server": "Apache/2.2.15 (Red Hat) mod_ssl/2.2.15 OpenSSL/1.0.1e-fips",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": [
+            "tardis.techservices.illinois.edu"
+        ]
     },
     "stevetarzia.com": {
-        "scan_time": 1615932514.1102057,
+        "scan_time": 1615933678.2134075,
         "ipv4_addresses": [
             "54.245.121.172"
         ],
@@ -269,10 +314,13 @@
         "http_server": "Apache/2.2.34 (Amazon)",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": [
+            "grits.stevetarzia.com"
+        ]
     },
     "clocktab.com": {
-        "scan_time": 1615932515.9977524,
+        "scan_time": 1615933680.2109668,
         "ipv4_addresses": [
             "172.67.220.24",
             "104.21.35.119"
@@ -284,10 +332,11 @@
         "http_server": "cloudflare",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": []
     },
     "auditoryneuroscience.com": {
-        "scan_time": 1615932516.7744303,
+        "scan_time": 1615933680.9987314,
         "ipv4_addresses": [
             "144.214.26.111"
         ],
@@ -295,21 +344,27 @@
         "http_server": "Apache/2.4.29 (Ubuntu)",
         "insecure_http": true,
         "redirect_to_https": false,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": [
+            "twinkle.bms.cityu.edu.hk"
+        ]
     },
     "asee.org": {
-        "scan_time": 1615932518.2503772,
+        "scan_time": 1615933683.314027,
         "ipv4_addresses": [
             "216.185.13.131"
         ],
         "ipv6_addresses": [],
-        "http_server": "Apache/2.4.7 (Ubuntu)",
+        "http_server": null,
         "insecure_http": true,
         "redirect_to_https": false,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": [
+            "216-185-13-131.i95.net"
+        ]
     },
     "gradeinflation.com": {
-        "scan_time": 1615932524.228406,
+        "scan_time": 1615933690.3781397,
         "ipv4_addresses": [
             "66.70.176.24"
         ],
@@ -317,22 +372,28 @@
         "http_server": "Apache",
         "insecure_http": true,
         "redirect_to_https": false,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": [
+            "ahs4.r4l.com"
+        ]
     },
     "spacejam.com": {
-        "scan_time": 1615932524.9335332,
+        "scan_time": 1615933691.3213117,
         "ipv4_addresses": [
-            "75.2.104.223",
-            "99.83.180.228"
+            "99.83.180.228",
+            "75.2.104.223"
         ],
         "ipv6_addresses": [],
         "http_server": "Apache/2.4.43 () OpenSSL/1.0.2k-fips",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": true
+        "hsts": true,
+        "rdns_names": [
+            "a259cf76d74e1f65f.awsglobalaccelerator.com"
+        ]
     },
     "pmichaud.com": {
-        "scan_time": 1615932525.7484875,
+        "scan_time": 1615933692.2199283,
         "ipv4_addresses": [
             "23.254.203.248"
         ],
@@ -340,13 +401,16 @@
         "http_server": "Apache",
         "insecure_http": true,
         "redirect_to_https": false,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": [
+            "hwsrv-233708.hostwindsdns.com"
+        ]
     },
     "kli.org": {
-        "scan_time": 1615932526.7753954,
+        "scan_time": 1615933693.1899152,
         "ipv4_addresses": [
-            "104.21.22.57",
-            "172.67.202.249"
+            "172.67.202.249",
+            "104.21.22.57"
         ],
         "ipv6_addresses": [
             "2606:4700:3032::6815:1639",
@@ -355,6 +419,7 @@
         "http_server": "cloudflare",
         "insecure_http": true,
         "redirect_to_https": true,
-        "hsts": false
+        "hsts": false,
+        "rdns_names": []
     }
 }

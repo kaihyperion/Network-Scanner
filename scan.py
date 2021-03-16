@@ -56,8 +56,8 @@ class Scanner:
             self.result[url]["hsts"] = self.hsts(url)
             #self.result[url]["tls_versions"] = list(itertools.compress(list_tls, selectors=self.tls_version(url)))
             #self.result[url]["root_ca"] = self.root_ca(url)
-            #for ipv4 in self.result[url]["ipv4_addresses"]:
-                #self.result[url]["rdns_names"] = self.rdns_names(ipv4)
+            for ipv4 in self.result[url]["ipv4_addresses"]:
+                self.result[url]["rdns_names"] = self.rdns_names(ipv4)
 
         with open(self.output_json, 'w') as writer:
             json.dump(self.result, writer, sort_keys=False, indent=4)
@@ -145,7 +145,6 @@ class Scanner:
                 return None
 
 
-
     def https_redirect(self, url):
         redirect_flag = False
         site = "http://" + url +":80"
@@ -161,6 +160,7 @@ class Scanner:
                 print("error or timeout in https_redirect", url)
                 return None
 
+
     def hsts(self, url):
         hsts_flag = False
         site = "http://" + url +":80"
@@ -175,44 +175,63 @@ class Scanner:
                 print("error or timeout in hsts", url)
                 return None
 
+
     def tls_version(self, url):
         port_num = 443
-        result = subprocess.run(["nmap","--script","ssl-enum-ciphers","-p","443",url], timeout = 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8').split()
         list_of_tls = ["TLSv1.0:", "TLSv1.1:","TLSv1.2:"]
         bool_result = []
 
-        # check which of TLSv1.0-1.2 is in the nmapped of url
-        for i in list_of_tls:
-            bool_result.append(i in result)    # should return a bool mask showing T/F for each value
+        while True:
+            try:
+                result = subprocess.run(["nmap","--script","ssl-enum-ciphers","-p","443",url], timeout = 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8').split()
+                # check which of TLSv1.0-1.2 is in the nmapped of url
+                for i in list_of_tls:
+                    bool_result.append(i in result)    # should return a bool mask showing T/F for each value
 
-        #output = list(itertools.compress(list_of_tls, mask))
+                #output = list(itertools.compress(list_of_tls, mask))
 
-        # We need to check if it can support TLSv1.3
-        # nmap doesn't support TLSv1.3
-        result = subprocess.run(["openssl","s_client","-tls1_3","-connect", url+":443"],timeout= 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out = result.stdout.decode('utf-8').split()
-        bool_result.append("TLSv1.3" in out) #This should add true or false for tlsv1.3
+                # We need to check if it can support TLSv1.3
+                # nmap doesn't support TLSv1.3
+                result = subprocess.run(["openssl","s_client","-tls1_3","-connect", url+":443"],timeout= 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                out = result.stdout.decode('utf-8').split()
+                bool_result.append("TLSv1.3" in out) #This should add true or false for tlsv1.3
 
-        return bool_result  # Returns a list of boolean
+                return bool_result  # Returns a list of boolean 
+            except:
+                print("error or timeout in tls version", url)
+                return None
+
 
     # List the root CA at the base of the chain of trust for validating this server's public key.
     # Just list the "organization name" (found under'O") - Can be found using openssl
     def root_ca(self, url):
         port_num = 443
-        result = subprocess.run(["openssl","s_client", "-connect",url+":"+port_num], timeout=2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out = result.stdout.decode('utf-8').split("O = ")[1]
-        out = out.split(", CN")[0]
-        return out
+
+        while True:
+            try:
+                result = subprocess.run(["openssl","s_client", "-connect",url+":"+port_num], timeout=2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                out = result.stdout.decode('utf-8').split("O = ")[1]
+                out = out.split(", CN")[0]
+                return out
+            except:
+                print("error or timeout in root certificate authority", url)
+                return None
+
 
     def rdns_names(self, ipv4):
-        result = subprocess.run(["nslookup", "-type=PTR", ipv4], timeout = 2, stdout = subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
-        result = result.splitlines()
-        rdns_list = []
-        for i in result:
-            if "name = " in i:
-                output = i.split('name = ')[1].strip(' \t\r\n')
-                rdns_list.append(output)
-        return rdns_list
+        while True:
+            try:
+                result = subprocess.run(["nslookup", "-type=PTR", ipv4], timeout = 2, stdout = subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
+                result = result.splitlines()
+                rdns_list = []
+                for i in result:
+                    if "name = " in i:
+                        output = i.split('name = ')[1].strip(' \t\r\n')
+                        rdns_list.append(output)
+                return rdns_list
+            except:
+                print("error or timeout in rdns names lookup")
+                return None
 
 
 
