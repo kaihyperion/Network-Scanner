@@ -152,6 +152,7 @@ class Report:
         ### INITIALIZATION: ###
         websites = []
         categories = {}
+        tls_dict = {}
         wanted_cat = ["tls_versions","insecure_http","redirect_to_https","hsts","ipv6_addresses"]
 
         widths = []
@@ -169,6 +170,16 @@ class Report:
                 categories[s] = 0
 
         # tally up totals for each category, store in categories dictionary
+        if 'tls_versions' in categories.keys():
+            for j in websites:
+                vers = self.website_data[j]['tls_versions']
+                for v in vers:
+                    if tls_dict.get(v) != None:
+                        tls_dict[v] += 1
+                    else:
+                        tls_dict[v] = 1
+            del categories['tls_versions']
+
         for c in categories.keys():
             for w in websites:
                 value = self.website_data[w][c]
@@ -180,7 +191,7 @@ class Report:
                         if value is True:
                             categories[c] += 1
 
-        num_rows = len(categories) + 1
+        num_rows = len(categories) + len(tls_dict)
         num_cols = 2
 
         #adjust width, alignment of columns
@@ -191,7 +202,13 @@ class Report:
         ### BUILD MATRIX: a list of lists, where each list contains the information for a category ###
         matrix = [["supported_category", "percentage %"]]
 
-        # iterate through categories, calculate percentage, craete row
+        # special iterator/builder for tls versions
+        for t in tls_dict.keys():
+            p = (tls_dict[t] / num_websites)*100
+            p_row = [t, p]
+            matrix.append(p_row)
+
+        # iterate through categories, calculate percentage, create row
         for x in categories.keys():
             percent = (categories[x] / num_websites)*100
             percentage_row = [x, percent]
