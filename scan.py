@@ -56,8 +56,9 @@ class Scanner:
             self.result[url]["hsts"] = self.hsts(url)
             #self.result[url]["tls_versions"] = list(itertools.compress(list_tls, selectors=self.tls_version(url)))
             #self.result[url]["root_ca"] = self.root_ca(url)
-            for ipv4 in self.result[url]["ipv4_addresses"]:
-                self.result[url]["rdns_names"] = self.rdns_names(ipv4)
+            if self.result[url]["ipv4_addresses"] is not None:         # need to catch if there was a timeout/error in ipv4_addresses
+                for ipv4 in self.result[url]["ipv4_addresses"]:
+                    self.result[url]["rdns_names"] = self.rdns_names(ipv4)
 
         with open(self.output_json, 'w') as writer:
             json.dump(self.result, writer, sort_keys=False, indent=4)
