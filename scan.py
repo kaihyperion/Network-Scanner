@@ -15,6 +15,8 @@ import subprocess
 
 import requests # Necessary for Http_server parts
 import itertools
+import math
+import socket
 
 
 """
@@ -32,10 +34,17 @@ class Scanner:
         self.url_list = []
         #Create a nested dictionary
         self.result = {}
+        self.port_list = [80, 443, 22]
+        self.public_dns_resolvers = ["208.67.222.222", "1.1.1.1","8.8.8.8","8.26.56.26","9.9.9.9","64.6.65.6","91.239.100.100","185.228.168.168","77.88.8.7","156.154.70.1","198.101.242.72","176.103.130.130"]
+
 
         # Session(): learned from requests.readthedocs.io/en/master/user/advanced/
         self.requestor = requests.Session()
         self.timeout = 2
+
+        #TLS VERsion:
+        self.list_of_tls_names = ['TLSv1','TLSv1.1','TLSv1.2', 'TLSv1.3']
+        self.list_of_tls_commands = ['-tls1', '-tls1_1', '-tls1_2', '-tls1_3']
 
         # parse through txt file and put url into list.
         with open(self.filename, 'r') as url_reader:
@@ -43,76 +52,64 @@ class Scanner:
 
                 self.url_list.append(url.strip('\n'))
 
-        list_tls = ["TLSv1.0", "TLSv1.1", "TLSv1.2", "TLSv1.3"]
         for url in self.url_list:
             print('now scanning:', url)
             self.result[url]={}
             self.result[url]["scan_time"] = self.scan_time()
-            self.result[url]["ipv4_addresses"] = self.ipv4_addresses(url)
-            self.result[url]["ipv6_addresses"] = self.ipv6_addresses(url)
+            self.result[url]["ipv4_addresses"] = self.ipv_addresses(url, ipv4or6 = '-type=A')
+            self.result[url]["ipv6_addresses"] = self.ipv_addresses(url, ipv4or6='-type=AAAA')
             self.result[url]["http_server"] = self.http_server(url)
-            self.result[url]["insecure_http"] = self.insecure_http(url)
-            self.result[url]["redirect_to_https"] = self.https_redirect(url)
-            self.result[url]["hsts"] = self.hsts(url)
-            #self.result[url]["tls_versions"] = list(itertools.compress(list_tls, selectors=self.tls_version(url)))
+            self.result[url]["insecure_http"], self.result[url]["redirect_to_https"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url)
+            #self.result[url]["tls_versions"] = list(itertools.compress(self.list_of_tls_names, selectors=self.tls_version(url)))
             #self.result[url]["root_ca"] = self.root_ca(url)
-            if self.result[url]["ipv4_addresses"] is not None:         # need to catch if there was a timeout/error in ipv4_addresses
-                for ipv4 in self.result[url]["ipv4_addresses"]:
-                    self.result[url]["rdns_names"] = self.rdns_names(ipv4)
-            else: self.result[url]["rdns_names"] = None
+            for ipv4 in self.result[url]["ipv4_addresses"]:
+                self.result[url]["rdns_names"] = self.rdns_names(ipv4)
+            self.result[url]["rtt_range"] = self.rtt_range(url)
+            print('DONE SCANNING:', url)
 
         with open(self.output_json, 'w') as writer:
             json.dump(self.result, writer, sort_keys=False, indent=4)
 
+
     def scan_time(self):
         return time.time()
 
-    def ipv4_addresses(self, url):
+
+    def ipv_addresses(self, url, ipv4or6):
         while True:
-            try:
-                completed = subprocess.run(['nslookup', '-type=A', url], timeout = self.timeout, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-                temp = completed.stdout.decode('utf-8', errors='ignore').splitlines()
-                # Extract the index where it shows Addresses
-                idx = 0
-                addr_list = []
-                for sub in temp:
-                    if sub.startswith("Name"):
-                        addr_list = temp[idx+1:]
-                        break
-                    idx += 1
+            ipv_list = []
+            for dns_addr in self.public_dns_resolvers:
+                try:
+                    #print("DNS: "+ dns_addr)
+                    completed = subprocess.run(['nslookup', ipv4or6, url, dns_addr], timeout = self.timeout, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+                    temp = completed.stdout.decode('utf-8', errors='ignore').splitlines()
+                    # Extract the index where it shows Addresses
+                    idx = 0
+                    addr_list = []
+                    for sub in temp:
+                        if sub.startswith("Name"):
+                            addr_list = temp[idx+1:]
+                            #print(addr_list)
+                            break
+                        idx += 1
 
-                ipv4_list = []
-                for i in addr_list:
-                    if len(i.split()) != 0:
-                        ipv4_list.append(i.split()[-1])
-                return ipv4_list
-            except:
-                print("error or timeout in ipv4 lookup", url)
-                return None
+                    for i in addr_list:
+                        keyword_flag = True
+                        if i.startswith("Aliases:"):
+                            keyword_flag = False
+                        if len(i.split()) != 0 and (keyword_flag == True):
+                            ipv = i.split()[-1]
+                            #print(ipv)
+                            if ipv in ipv_list:
+                                pass
+                            else:
+                                ipv_list.append(ipv)
+                        #print(ipv_list)
 
-
-    def ipv6_addresses(self, url):
-        while True:
-            try:
-                completed = subprocess.run(['nslookup', '-type=AAAA', url], timeout = self.timeout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                temp = completed.stdout.decode('utf-8', errors='ignore').splitlines()
-
-                idx = 0
-                addr_list = []
-                for sub in temp:
-                    if sub.startswith("Name"):
-                        addr_list = temp[idx+1:]
-                        break
-                    idx += 1
-
-                ipv6_list = []
-                for i in addr_list:
-                    if len(i.split()) != 0:
-                        ipv6_list.append(i.split()[-1])
-                return ipv6_list
-            except:
-                print("error or timeout in ipv6 lookup", url)
-                return None
+                except:
+                    print("error or timeout in ipv lookup, Retrying:", url)
+                    pass
+            return ipv_list
 
 
     def http_server(self, url):
@@ -132,108 +129,117 @@ class Scanner:
                 return None
 
 
-    def insecure_http(self, url):
-        insecure_flag = False
+    def http_insecure_redirect_hsts(self, url):
         site = "http://" + url +":80"
-
-        while True:
-            try:
-                r = self.requestor.get(site, timeout = self.timeout)
-                if r.status_code == 200:
-                    insecure_flag = True
-                return insecure_flag
-            except:
-                print("error or timeout in insecure_http", url)
-                return None
-
-
-    def https_redirect(self, url):
+        insecure_flag = True
         redirect_flag = False
-        site = "http://" + url +":80"
-        self.requestor.max_redirects = 10
-
-        while True:
-            try:
-                r = self.requestor.get(site, timeout = self.timeout)
-                if len(r.history) > 0 and r.url[0:8] == "https://":
-                    redirect_flag = True
-                return redirect_flag
-            except:
-                print("error or timeout in https_redirect", url)
-                return None
-
-
-    def hsts(self, url):
         hsts_flag = False
-        site = "http://" + url +":80"
-
-        while True:
-            try:
-                r = self.requestor.get(site, timeout = self.timeout)
-                if 'Strict-Transport-Security' in r.headers and r.url[0:8] == "https://":
-                    hsts_flag = True
-                return hsts_flag
-            except:
-                print("error or timeout in hsts", url)
-                return None
-
+        self.requestor.max_redirects = 10
+        try:
+            r = self.requestor.get(site, timeout=self.timeout)
+            if r.status_code >= 500:
+                insecure_flag = False
+            if len(r.history) > 0 and r.url[0:8] == "https://":
+                redirect_flag = True
+            if 'Strict-Transport-Security' in r.headers and r.url[0:8] == "https://":
+                hsts_flag = True
+            return insecure_flag, redirect_flag, hsts_flag
+        except:
+            print("error or timeout in insecure_redirect_hsts",url)
+            return insecure_flag, redirect_flag, hsts_flag
 
     def tls_version(self, url):
-        port_num = 443
-        list_of_tls = ["TLSv1.0:", "TLSv1.1:","TLSv1.2:"]
+        repeat = 0
         bool_result = []
-
+        #print("starting :", url)
         while True:
             try:
-                result = subprocess.run(["nmap","--script","ssl-enum-ciphers","-p","443",url], timeout = 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8').split()
-                # check which of TLSv1.0-1.2 is in the nmapped of url
-                for i in list_of_tls:
-                    bool_result.append(i in result)    # should return a bool mask showing T/F for each value
+                for i in range(len(self.list_of_tls_commands)):
+                    #print("Checking :", self.list_of_tls_names[i])
+                    tls_flag = True
+                    r = subprocess.run(['openssl', 's_client', '-connect',url + ':443', self.list_of_tls_commands[i]],
+                                       stdout = subprocess.PIPE, stderr = subprocess.PIPE, input = b'', timeout = self.timeout)
+                    result = r.stdout.decode().splitlines()
 
-                #output = list(itertools.compress(list_of_tls, mask))
-
-                # We need to check if it can support TLSv1.3
-                # nmap doesn't support TLSv1.3
-                result = subprocess.run(["openssl","s_client","-tls1_3","-connect", url+":443"],timeout= 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                out = result.stdout.decode('utf-8').split()
-                bool_result.append("TLSv1.3" in out) #This should add true or false for tlsv1.3
-
-                return bool_result  # Returns a list of boolean 
+                    # Parse through STDOUT to see if the following catch phrase is there or not.
+                    for j in result:
+                        if j.startswith("no peer certificate available"):
+                            tls_flag = False        # Flag is False if it DOES NOT SUPPORT TLS_Version
+                        if j.startswith("-----BEGIN CERTIFICATE-----"):
+                            tls_flag = True
+                    bool_result.append(tls_flag)
             except:
-                print("error or timeout in tls version", url)
-                return None
-
+                if repeat < 3:
+                    print("timeout in tls_version, Retrying:", url)
+                    repeat += 1
+                else:
+                    pass
+            return bool_result
 
     # List the root CA at the base of the chain of trust for validating this server's public key.
     # Just list the "organization name" (found under'O") - Can be found using openssl
     def root_ca(self, url):
         port_num = 443
-
         while True:
-            try:
-                result = subprocess.run(["openssl","s_client", "-connect",url+":"+port_num], timeout=2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                out = result.stdout.decode('utf-8').split("O = ")[1]
-                out = out.split(", CN")[0]
-                return out
-            except:
-                print("error or timeout in root certificate authority", url)
-                return None
-
+            result = subprocess.run(["openssl","s_client", "-connect",url+":"+str(port_num)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            out = result.stdout.decode('utf-8').split("O = ")[1]
+            out = out.split(", CN")[0]
+            return out
 
     def rdns_names(self, ipv4):
+        repeat = 0
+        rdns_list = [] #keep this outside of while True, there was an error where it returned early and couldn't find where rdns_list was assigned
         while True:
             try:
-                result = subprocess.run(["nslookup", "-type=PTR", ipv4], timeout = 2, stdout = subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
+                result = subprocess.run(["nslookup", "-type=PTR", ipv4], timeout = self.timeout, stdout = subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
                 result = result.splitlines()
-                rdns_list = []
                 for i in result:
                     if "name = " in i:
                         output = i.split('name = ')[1].strip(' \t\r\n')
                         rdns_list.append(output)
-                return rdns_list
             except:
-                print("error or timeout in rdns names lookup")
-                return None
+                if repeat < 3:
+                    print("error or timeout in rdns_names: Retrying")
+                    repeat += 1
+                else:
+                    pass
+            return rdns_list
+
+
+    def rtt_range(self, url):
+        output = []
+        for port in self.port_list:
+            try:
+                #print("Addr: %s. Trying on PORT: %s" % (url, port))
+
+                #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                rtt = self.rtt_helper(url, port)
+                output.append(rtt)
+
+                rtt = self.rtt_helper(url, port)
+                output.append(rtt)
+
+                rtt = self.rtt_helper(url, port)
+                output.append(rtt)
+                #print("Output: "+str(output))
+            except:
+                #print("SKIPPING PORT: %s" % port)
+                pass
+        if not output:
+            return None
+        else:
+            result = [min(output)*1000, max(output)*1000]
+            #print(result)
+            return result
+
+    def rtt_helper(self, url, port):
+        start = time.time()
+        requests.get("http://"+url + ":"+str(port), timeout = 1)
+        #sock.send(request.encode())
+        #sock.recv(1024)
+        end = time.time()
+        timee = end-start
+        return timee
 
 
 
