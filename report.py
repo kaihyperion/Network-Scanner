@@ -22,7 +22,7 @@ class Report:
             output.write("\n" + "\n" + "\n" + "\n")
 
             output.write("### RTT RANGES: ###\n")
-            #output.write(self.rtt_table())
+            output.write(self.rtt_table())
 
             output.write("\n" + "\n" + "\n" + "\n")
 
@@ -79,7 +79,7 @@ class Report:
             matrix.append(website_row)
 
         ### BUILD TABLE: ###
-        table = texttable.Texttable()
+        table = texttable.Texttable(max_width=0)
         table.set_cols_width(widths)
         table.set_cols_align(align)
 
@@ -88,10 +88,111 @@ class Report:
         return table.draw()
 
     def rtt_table(self):
-        pass
+    ### INITIALIZATION: ###
+        websites = []
+        rtt_tuples = []
+        rtt_null = []
+
+        widths = []
+        align = []
+
+        # extract list of websites
+        for website in self.website_data.keys():
+            websites.append(website)
+
+        # extract rtt_range for each website, make (website, rtt_range, min_rtt) tuple
+        for w in websites:
+            r = self.website_data[w]["rtt_range"]
+            if r != None:
+                min = r[0]
+                rtt_tuples.append((w,r,min))
+            else:
+                rtt_null.append((w,r))
+
+        rtt_tuples = sorted(rtt_tuples, key=lambda tup: tup[2])
+
+        num_rows = len(rtt_tuples) + len(rtt_null) + 1
+        num_cols = 2
+
+        #adjust width, alignment of columns
+        for i in range(num_cols):
+            widths.append(20)
+            align.append('c')
+
+        ### BUILD MATRIX: a list of lists, where each list contains the rtt information for a website ###
+        matrix = [['website_name', 'rtt_range']]
+
+        # iterate through list of website, rtt_range, min rtt tuples and make a row
+        for (n,x,m) in rtt_tuples:
+            row = [n, x]
+            matrix.append(row)
+
+        for(a,b) in rtt_null:
+            row = [a, b]
+            matrix.append(row)
+
+        ### BUILD TABLE: ###
+        table = texttable.Texttable(max_width=0)
+        table.set_cols_width(widths)
+        table.set_cols_align(align)
+
+        table.add_rows(matrix)
+        print (table.draw())
+        return table.draw()
 
     def rootca_table(self):
-        pass
+    ### INITIALIZATION: ###
+        websites = []
+        ca_totals = {}
+        tuples = []
+
+        widths = []
+        align = []
+
+        # extract list of websites
+        for website in self.website_data.keys():
+            websites.append(website)
+
+        # build ca_totals dictionary, maps ca to number of occurences
+        for w in websites:
+            ca = self.website_data[w]["root_ca"]
+            if ca != None:
+                if ca_totals.get(ca) != None:
+                    ca_totals[ca] += 1
+                else:
+                    ca_totals[ca] = 1
+
+        # some weird stuff I needed to do sort by occurence #
+        for s in ca_totals.keys():
+            t = (s, ca_totals[s])
+            tuples.append(t)
+        tuples = sorted(tuples, key=lambda tup: tup[1])
+        tuples.reverse()
+
+        num_rows = len(tuples) + 1
+        num_cols = 2
+
+        #adjust width, alignment of columns
+        for i in range(num_cols):
+            widths.append(20)
+            align.append('c')
+
+        ### BUILD MATRIX: a list of lists, where each list contains the information for a ca ###
+        matrix = [['root_ca_name', 'ca_count']]
+
+        # iterate through list of ca, ca_count tuples and make rows
+        for (n,x) in tuples:
+            row = [n, x]
+            matrix.append(row)
+
+        ### BUILD TABLE: ###
+        table = texttable.Texttable(max_width=0)
+        table.set_cols_width(widths)
+        table.set_cols_align(align)
+
+        table.add_rows(matrix)
+        print (table.draw())
+        return table.draw()
 
     def server_table(self):
         ### INITIALIZATION: ###
@@ -139,7 +240,7 @@ class Report:
             matrix.append(row)
 
         ### BUILD TABLE: ###
-        table = texttable.Texttable()
+        table = texttable.Texttable(max_width=0)
         table.set_cols_width(widths)
         table.set_cols_align(align)
 
@@ -215,7 +316,7 @@ class Report:
             matrix.append(percentage_row)
 
         ### BUILD TABLE: ###
-        table = texttable.Texttable()
+        table = texttable.Texttable(max_width=0)
         table.set_cols_width(widths)
         table.set_cols_align(align)
 
