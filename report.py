@@ -10,73 +10,38 @@ class Report:
         self.filename = input_file
         self.output_file = output_file
         self.website_data = {} #nested dictionary
+        self.websites = []
 
         # load json file into dictionary called "website_data"
         with open(self.filename, 'r') as f:
             self.website_data = json.load(f)
 
-        with open(self.output_file, 'w') as output:
-            output.write("### ALL PART 2 INFORMATION: ###\n")
-            output.write(self.general_table())
-
-            output.write("\n" + "\n" + "\n" + "\n")
-
-            output.write("### RTT RANGES: ###\n")
-            output.write(self.rtt_table())
-
-            output.write("\n" + "\n" + "\n" + "\n")
-
-            output.write("### ROOT CA'S: ###\n")
-            #output.write(self.rootca_table())
-
-            output.write("\n" + "\n" + "\n" + "\n")
-
-            output.write("### WEB SERVERS: ###\n")
-            output.write(self.server_table())
-
-            output.write("\n" + "\n" + "\n" + "\n")
-
-            output.write("### SUPPORT FOR: ###\n")
-            output.write(self.percent_table())
-
-
-
-    def general_table(self):
-        ### INITIALIZATION: ###
-        websites = []
-        scanners = ['website_name']
-
-        widths = []
-        align = []
-
         # extract list of websites
         for website in self.website_data.keys():
-            websites.append(website)
+            self.websites.append(website)
 
-        # extract list of scanners
-        for s in self.website_data[websites[0]].keys():
-            scanners.append(s)
+        # insert these back in later #
+        #self.rootca_table(),
+        #"### ROOT CA'S: ###\n"
 
-        num_rows = len(websites) + 1
-        num_cols = len(scanners)
+        self.tables = [self.general_table(), self.rtt_table(), self.server_table(), self.percent_table()]
+        self.labels = ["### ALL PART 2 INFORMATION: ###\n", "### RTT RANGES: ###\n","### WEB SERVERS: ###\n","### SUPPORT FOR: ###\n"]
+
+        with open(self.output_file, 'w') as output:
+            for i in range(len(self.tables)):
+                output.write(self.labels[i])
+                output.write(self.tables[i])
+                output.write("\n" + "\n" + "\n" + "\n")
+
+
+    def table_maker(self, matrix, num_cols):
+        widths = []
+        align = []
 
         #adjust width, alignment of columns
         for i in range(num_cols):
             widths.append(20)
             align.append('c')
-
-        ### BUILD MATRIX: a list of lists, where each list contains the information for a website ###
-        matrix = [scanners]
-
-        # iterate through list of websites, retrieve data from website_data, add to list that represents row in table
-        for w in websites:
-            website_row = [w]
-            for n in self.website_data[w].values():
-                if type(n) is bool:
-                    website_row.append(str(n))
-                else:
-                    website_row.append(n)
-            matrix.append(website_row)
 
         ### BUILD TABLE: ###
         table = texttable.Texttable(max_width=0)
@@ -87,21 +52,41 @@ class Report:
         print (table.draw())
         return table.draw()
 
+
+    def general_table(self):
+        ### INITIALIZATION: ###
+        scanners = ['website_name']
+
+        # extract list of scanners
+        for s in self.website_data[self.websites[0]].keys():
+            scanners.append(s)
+
+        num_rows = len(self.websites) + 1
+        num_cols = len(scanners)
+
+        ### BUILD MATRIX: a list of lists, where each list contains the information for a website ###
+        matrix = [scanners]
+
+        # iterate through list of websites, retrieve data from website_data, add to list that represents row in table
+        for w in self.websites:
+            website_row = [w]
+            for n in self.website_data[w].values():
+                if type(n) is bool:
+                    website_row.append(str(n))
+                else:
+                    website_row.append(n)
+            matrix.append(website_row)
+
+        return self.table_maker(matrix,num_cols)
+
+
     def rtt_table(self):
-    ### INITIALIZATION: ###
-        websites = []
+        ### INITIALIZATION: ###
         rtt_tuples = []
         rtt_null = []
 
-        widths = []
-        align = []
-
-        # extract list of websites
-        for website in self.website_data.keys():
-            websites.append(website)
-
         # extract rtt_range for each website, make (website, rtt_range, min_rtt) tuple
-        for w in websites:
+        for w in self.websites:
             r = self.website_data[w]["rtt_range"]
             if r != None:
                 min = r[0]
@@ -113,11 +98,6 @@ class Report:
 
         num_rows = len(rtt_tuples) + len(rtt_null) + 1
         num_cols = 2
-
-        #adjust width, alignment of columns
-        for i in range(num_cols):
-            widths.append(20)
-            align.append('c')
 
         ### BUILD MATRIX: a list of lists, where each list contains the rtt information for a website ###
         matrix = [['website_name', 'rtt_range']]
@@ -131,30 +111,16 @@ class Report:
             row = [a, b]
             matrix.append(row)
 
-        ### BUILD TABLE: ###
-        table = texttable.Texttable(max_width=0)
-        table.set_cols_width(widths)
-        table.set_cols_align(align)
-
-        table.add_rows(matrix)
-        print (table.draw())
-        return table.draw()
+        return self.table_maker(matrix,num_cols)
+    
 
     def rootca_table(self):
-    ### INITIALIZATION: ###
-        websites = []
+        ### INITIALIZATION: ###
         ca_totals = {}
         tuples = []
 
-        widths = []
-        align = []
-
-        # extract list of websites
-        for website in self.website_data.keys():
-            websites.append(website)
-
         # build ca_totals dictionary, maps ca to number of occurences
-        for w in websites:
+        for w in self.websites:
             ca = self.website_data[w]["root_ca"]
             if ca != None:
                 if ca_totals.get(ca) != None:
@@ -172,11 +138,6 @@ class Report:
         num_rows = len(tuples) + 1
         num_cols = 2
 
-        #adjust width, alignment of columns
-        for i in range(num_cols):
-            widths.append(20)
-            align.append('c')
-
         ### BUILD MATRIX: a list of lists, where each list contains the information for a ca ###
         matrix = [['root_ca_name', 'ca_count']]
 
@@ -185,30 +146,16 @@ class Report:
             row = [n, x]
             matrix.append(row)
 
-        ### BUILD TABLE: ###
-        table = texttable.Texttable(max_width=0)
-        table.set_cols_width(widths)
-        table.set_cols_align(align)
+        return self.table_maker(matrix,num_cols)
 
-        table.add_rows(matrix)
-        print (table.draw())
-        return table.draw()
 
     def server_table(self):
         ### INITIALIZATION: ###
-        websites = []
         server_totals = {}
         tuples = []
 
-        widths = []
-        align = []
-
-        # extract list of websites
-        for website in self.website_data.keys():
-            websites.append(website)
-
         # build server_totals dictionary, maps server to number of occurences
-        for w in websites:
+        for w in self.websites:
             server = self.website_data[w]["http_server"]
             if server != None:
                 if server_totals.get(server) != None:
@@ -226,11 +173,6 @@ class Report:
         num_rows = len(tuples) + 1
         num_cols = 2
 
-        #adjust width, alignment of columns
-        for i in range(num_cols):
-            widths.append(20)
-            align.append('c')
-
         ### BUILD MATRIX: a list of lists, where each list contains the information for a server ###
         matrix = [['server_name', 'server_count']]
 
@@ -239,40 +181,25 @@ class Report:
             row = [n, x]
             matrix.append(row)
 
-        ### BUILD TABLE: ###
-        table = texttable.Texttable(max_width=0)
-        table.set_cols_width(widths)
-        table.set_cols_align(align)
-
-        table.add_rows(matrix)
-        print (table.draw())
-        return table.draw()
+        return self.table_maker(matrix,num_cols)
 
 
     def percent_table(self):
         ### INITIALIZATION: ###
-        websites = []
         categories = {}
         tls_dict = {}
         wanted_cat = ["tls_versions","insecure_http","redirect_to_https","hsts","ipv6_addresses"]
 
-        widths = []
-        align = []
-
-        # extract list of websites
-        for website in self.website_data.keys():
-            websites.append(website)
-
-        num_websites = len(websites)
+        num_websites = len(self.websites)
 
         # extract list of specific scanners that are available - mainly for debug
-        for s in self.website_data[websites[0]].keys():
+        for s in self.website_data[self.websites[0]].keys():
             if s in wanted_cat:
                 categories[s] = 0
 
         # tally up totals for each category, store in categories dictionary
         if 'tls_versions' in categories.keys():
-            for j in websites:
+            for j in self.websites:
                 vers = self.website_data[j]['tls_versions']
                 for v in vers:
                     if tls_dict.get(v) != None:
@@ -282,7 +209,7 @@ class Report:
             del categories['tls_versions']
 
         for c in categories.keys():
-            for w in websites:
+            for w in self.websites:
                 value = self.website_data[w][c]
                 if value is not None:
                     if c == 'ipv6_addresses':
@@ -294,11 +221,6 @@ class Report:
 
         num_rows = len(categories) + len(tls_dict)
         num_cols = 2
-
-        #adjust width, alignment of columns
-        for i in range(num_cols):
-            widths.append(20)
-            align.append('c')
 
         ### BUILD MATRIX: a list of lists, where each list contains the information for a category ###
         matrix = [["supported_category", "percentage %"]]
@@ -315,14 +237,7 @@ class Report:
             percentage_row = [x, percent]
             matrix.append(percentage_row)
 
-        ### BUILD TABLE: ###
-        table = texttable.Texttable(max_width=0)
-        table.set_cols_width(widths)
-        table.set_cols_align(align)
-
-        table.add_rows(matrix)
-        print (table.draw())
-        return table.draw()
+        return self.table_maker(matrix,num_cols)
 
 
 
