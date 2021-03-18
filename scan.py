@@ -17,6 +17,8 @@ import subprocess
 
 import requests # Necessary for Http_server parts
 import itertools
+import math
+import socket
 
 
 
@@ -37,9 +39,16 @@ class Scanner:
         self.url_list = []
         #Create a nested dictionary
         self.result = {}
+        self.port_list = [80, 443, 22]
+        self.public_dns_resolvers = ["208.67.222.222", "1.1.1.1","8.8.8.8","8.26.56.26","9.9.9.9","64.6.65.6","91.239.100.100","185.228.168.168","77.88.8.7","156.154.70.1","198.101.242.72","176.103.130.130"]
 
         # Session(): learned from requests.readthedocs.io/en/master/user/advanced/
         self.requestor = requests.Session()
+        self.timeout = 2
+
+        #TLS VERsion:
+        self.list_of_tls_names = ['TLSv1','TLSv1.1','TLSv1.2', 'TLSv1.3']
+        self.list_of_tls_commands = ['-tls1', '-tls1_1', '-tls1_2', '-tls1_3']
 
         scanner_tool = ["scan_time", "ipv4_addresses"]
 
@@ -49,19 +58,25 @@ class Scanner:
 
                 self.url_list.append(url.strip('\n'))
 
-        list_tls = ["TLSv1.0", "TLSv1.1", "TLSv1.2", "TLSv1.3"]
+
+
         for url in self.url_list:
             self.result[url]={}
-            self.result[url]["scan_time"] = self.scan_time()
-            self.result[url]["ipv4_addresses"] = self.ipv4_addresses(url)
-            #self.result[url]["ipv6_addresses"] = self.ipv6_addresses(url)
-            #self.result[url]["http_server"] = self.http_server(url)
-            #self.result[url]["insecure_http"] = self.insecure_http(url)
-            #self.result[url]["redirect_https"] = self.redirect_to_https(url)
-            #self.result[url]["tls_versions"] = list(itertools.compress(list_tls, selectors=self.tls_version(url)))
+            self.result[url]["rtt_range"] = self.rtt_range(url)
+            self.result[url]["scan_time"] = self.scan_time()       #Pass
+            self.result[url]["ipv4_addresses"] = self.ipv_addresses(url, ipv4or6 = '-type=A')      #Pass
+            self.result[url]["ipv6_addresses"] = self.ipv_addresses(url, ipv4or6='-type=AAAA')     #Pass
+            self.result[url]["http_server"] = self.http_server(url)            #Pass
+
+            self.result[url]["insecure http"], self.result[url]["redirect"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url) #Pass
+
+            #self.result[url]["tls_versions"] = list(itertools.compress(self.list_of_tls_names, selectors=self.tls_version(url))) #Passed on linux
+
             #self.result[url]["root_ca"] = self.root_ca(url)
             for ipv4 in self.result[url]["ipv4_addresses"]:
                 self.result[url]["rdns_names"] = self.rdns_names(ipv4)
+
+
 
         with open(self.output_json, 'w') as writer:
             # print(self.result)
@@ -70,143 +85,269 @@ class Scanner:
     def scan_time(self):
         return time.time()
 
-    def ipv4_addresses(self, url):
-        completed = subprocess.run(['nslookup', '-type=A', url], timeout = 2, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-        temp = completed.stdout.decode('utf-8', errors='ignore').splitlines()
-        # Extract the index where it shows Addresses
-        idx = 0
-        addr_list = []
-        for sub in temp:
-            if sub.startswith("Name"):
-                addr_list = temp[idx+1:]
-                break
-            idx += 1
+    def ipv_addresses(self, url, ipv4or6):
+        while True:
+            ipv_list = []
+            for dns_addr in self.public_dns_resolvers:
+                try:
+                    print("DNS: "+ dns_addr)
+                    completed = subprocess.run(['nslookup', ipv4or6, url, dns_addr], timeout = 2, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+                    temp = completed.stdout.decode('utf-8', errors='ignore').splitlines()
+                    # Extract the index where it shows Addresses
+                    idx = 0
+                    addr_list = []
+                    for sub in temp:
+                        if sub.startswith("Name"):
+                            addr_list = temp[idx+1:]
+                            print(addr_list)
+                            break
+                        idx += 1
 
-        ipv4_list = []
-        for i in addr_list:
-            if len(i.split()) != 0:
-                ipv4_list.append(i.split()[-1])
-        return ipv4_list
+                    for i in addr_list:
+                        keyword_flag = True
+                        if i.startswith("Aliases:"):
+                            keyword_flag = False
+                        if len(i.split()) != 0 and (keyword_flag == True):
+                            ipv = i.split()[-1]
+                            print(ipv)
+                            if ipv in ipv_list:
+                                pass
+                            else:
+                                ipv_list.append(ipv)
+                        print(ipv_list)
 
-    def ipv6_addresses(self, url):
-        completed = subprocess.run(['nslookup', '-type=AAAA', url], timeout = 2,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        temp = completed.stdout.decode('utf-8', errors='ignore').splitlines()
-
-        idx = 0
-        addr_list = []
-        for sub in temp:
-            if sub.startswith("Name"):
-                addr_list = temp[idx+1:]
-                break
-            idx += 1
-        ipv6_list = []
-        for i in addr_list:
-            if len(i.split()) != 0:
-                ipv6_list.append(i.split()[-1])
-        return ipv6_list
-
-
-    # def nslookup(self, url, type):
-    #     output = {}
-    #     type_dict = {'ipv4': '-type=A',
-    #                  'ipv6': '-type=AAAA'}
-    #
-    #     completed = subprocess.run(["nslookup", type_dict[type],  url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #     for line in completed.stdout.decode('utf-8', errors='ignore').splitlines():
-    #         partition = line.split()
-    #         if len(partition) >= 2:
-    #             if token[0] == 'Address:':
-    #                 output
-    #             output[token[0].rstrip(":")] = token[1]
-    #     completed.stdout.decode('utf-8', errors='ignore').split()
-    #     temp.stdout.splitlines()
+                except:
+                    print("error or timeout in ipv lookup", url)
+                    pass
+            return ipv_list
 
     def http_server(self, url):
         # utilize requests to GET data from http
         site = "http://" + url
-        r = self.requestor.get(site, timeout=2)
 
-        if 'server' not in r.headers:
-            server_name = None
-        else:
-            server_name = r.headers['server']
-        return server_name
+        while True:
+            try:
+                r = self.requestor.get(site, timeout=2)
 
 
-    def insecure_http(self, url):
-        insecure_flag = False
+                if 'server' not in r.headers:
+                    server_name = None
+                else:
+                    server_name = r.headers['server']
+                return server_name
+            except:
+                print("error or timeout in http_server", url)
+                return None
+
+    def http_insecure_redirect_hsts(self, url):
         site = "http://" + url +":80"
-        r = self.requestor.get(site, timeout=2)
-        print(r)
-        if r.status_code == 200:
-            insecure_flag = True
-        return insecure_flag
+        insecure_flag = True
+        redirect_flag = False
+        hsts_flag = False
+        self.requestor.max_redirects = 10
+        try:
+            r = self.requestor.get(site, timeout=self.timeout)
+            if r.status_code >= 500:
+                insecure_flag = False
+            if len(r.history) > 0 and r.url[0:8] == "https://":
+                redirect_flag = True
+            if len(r.history) == 0:
+                redirect_flag = False
+            if 'Strict-Transport-Security' in r.headers and r.url[0:8] == "https://":
+                hsts_flag = True
 
-# """
-# Redirect to https:
-# - Redirect responses have status codes that start with 3
-# - Location header holding the URL to redirect to
-# - By using Request.Session() We can explicitly specify the count of max_redirect
-# src: stackoverflow.com/questions/23651947/python-requests-requests-exceptions-toomanyredirects-exceeded-30-redirects
-# documentation: requests.readthedocs.io/en/master/
-# """
-#     def redirect_to_https(self, url):
-#         self.requestor.max_redirect = 10    # Thi sets the Max num of redirect allowed. if passed, toomanyredirects exception is raised.
-#         site = "http://"+url
-#         a = False
-#
-#         while True:
-#             try:
-#                 r = self.requestor.get(site, timeout=2)
-#                 if r.url.startswith("https//"):
-#                     a = True #checker for https redirect bool
-#                     return a
-#             except requests.exceptions.TooManyRedirects and requests.exceptions.ConnectTimeout:
-#                 a = False
-#                 return a
-#
-
-
+            return insecure_flag, redirect_flag, hsts_flag
+        except:
+            print("error or timeout in insecure http",url)
+            return insecure_flag, redirect_flag, hsts_flag
+    # def http_redirect(self, url):
+    #     redirect_flag = False
+    #     site = "http://" + url +":80"
+    #     self.requestor.max_redirect = 10
+    #
+    #     try:
+    #         r = self.requestor.get(site, timeout = self.timeout)
+    #         if len(r.history) > 0 and r.url[0:8] == "https://":
+    #             redirect_flag = True
+    #         elif len(r.history) == 0:
+    #             redirect_flag = False
+    #         return redirect_flag
+    #     except:
+    #         print("error/timeout in redirect")
+    #         return redirect_flag
+    #
+    # def hsts(self,url):
+    #     hsts_flag = False
+    #     site = "http://" + url +"80"
+    #
+    #     try:
+    #         r = self.requestor.get(site, timeout = self.timeout)
+    #         if 'Strict-Transport-Security' in r.headers and r.url[0:8] == "https://":
+    #             hsts_flag = True
+    #         return hsts_flag
+    #     except:
+    #         print("error or timout in hsts",url)
+    #         return None
     def tls_version(self, url):
-        port_num = 443
-        result = subprocess.run(["nmap","--script","ssl-enum-ciphers","-p","443",url], timeout = 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8').split()
-        list_of_tls = ["TLSv1.0:", "TLSv1.1:","TLSv1.2:"]
+
+        repeat = 0
         bool_result = []
+        repeat=0
+        print("starting :", url)
+        while True:
+            try:
+                for i in range(len(self.list_of_tls_commands)):
+                    print("Checking :", self.list_of_tls_names[i])
+                    tls_flag = True
+                    r = subprocess.run(['openssl', 's_client', '-connect',url + ':443', self.list_of_tls_commands[i]],
+                                       stdout = subprocess.PIPE, stderr = subprocess.PIPE, input = b'', timeout = 2)
+                    result = r.stdout.decode().splitlines()
 
-        # check which of TLSv1.0-1.2 is in the nmapped of url
-        for i in list_of_tls:
-            bool_result.append(i in result)    # should return a bool mask showing T/F for each value
-
-        #output = list(itertools.compress(list_of_tls, mask))
-
-        # We need to check if it can support TLSv1.3
-        # nmap doesn't support TLSv1.3
-        result = subprocess.run(["openssl","s_client","-tls1_3","-connect", url+":443"],timeout= 2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out = result.stdout.decode('utf-8').split()
-        bool_result.append("TLSv1.3" in out) #This should add true or false for tlsv1.3
-
-        return bool_result  # Returns a list of boolean
+                    # Parse through STDOUT to see if the following catch phrase is there or not.
+                    for j in result:
+                        if j.startswith("no peer certificate available"):
+                            tls_flag = False        # Flag is False if it DOES NOT SUPPORT TLS_Version
+                        if j.startswith("-----BEGIN CERTIFICATE-----"):
+                            tls_flag = True
+                    bool_result.append(tls_flag)
+            except:
+                if repeat < 3:
+                    print("Timed out: Retry")
+                    repeat += 1
+                else:
+                    pass
+            return bool_result
 
     # List the root CA at the base of the chain of trust for validating this server's public key.
     # Just list the "organization name" (found under'O") - Can be found using openssl
     def root_ca(self, url):
         port_num = 443
-        result = subprocess.run(["openssl","s_client", "-connect",url+":"+port_num], timeout=2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out = result.stdout.decode('utf-8').split("O = ")[1]
-        out = out.split(", CN")[0]
-        return out
+        while True:
+
+            result = subprocess.run(["openssl","s_client", "-connect",url+":"+str(port_num)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            out = result.stdout.decode('utf-8').split("O = ")[1]
+            out = out.split(", CN")[0]
+            return out
 
     def rdns_names(self, ipv4):
-        result = subprocess.run(["nslookup", "-type=PTR", ipv4], timeout = 2, stdout = subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
-        result = result.splitlines()
-        rdns_list = []
-        for i in result:
-            if "name = " in i:
-                output = i.split('name = ')[1].strip(' \t\r\n')
-                rdns_list.append(output)
-        return rdns_list
+        repeat = 0
+        while True:
+            try:
+                result = subprocess.run(["nslookup", "-type=PTR", ipv4], timeout = 2, stdout = subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
+                result = result.splitlines()
+                rdns_list = []
+                for i in result:
+                    if "name = " in i:
+                        output = i.split('name = ')[1].strip(' \t\r\n')
+                        rdns_list.append(output)
+
+            except:
+                if repeat < 3:
+                    print("error/timeout: Retrying...")
+                    repeat += 1
+                else:
+                    pass
+
+            return rdns_list
 
 
+    def rtt_range(self, url):
+
+        output = []
+        for port in self.port_list:
+            try:
+                print("Addr: %s. Trying on PORT: %s" % (url, port))
+
+
+                #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                rtt = self.rtt_helper(url, port)
+                output.append(rtt)
+
+                rtt = self.rtt_helper(url, port)
+                output.append(rtt)
+
+                rtt = self.rtt_helper(url, port)
+                output.append(rtt)
+                print("Output: "+str(output))
+
+            except:
+                print("SKIPPING PORT: %s" % port)
+                pass
+        if not output:
+            return None
+        else:
+            result = [min(output)*1000, max(output)*1000]
+            print(result)
+            return result
+
+    def rtt_helper(self, url, port):
+
+        start = time.time()
+
+        requests.get("http://"+url + ":"+str(port), timeout = 1)
+        #sock.send(request.encode())
+        #sock.recv(1024)
+        end = time.time()
+        timee = end-start
+
+        return timee
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # minimum = float('inf')
+        # maximum = float('-inf')
+        # repeat = False
+        # try:
+        #     temp = subprocess.run(["sh","-c","time echo -e '\x1dclose\x0d' | telnet " + url + " " + port], stdout = subprocess.PIPE, stderr=subprocess.PIPE)
+        #     print(temp.stderr.decode())
+        # except subprocess.CalledProcessError as c:
+        #     return c.output.decode()
+        # except Exception as e:
+        #     if not repeat:
+        #         temp = subprocess.run(["sh","-c","time echo -e '\x1dclose\x0d' | telnet " + url + " " + port], stdout = subprocess.PIPE, stderr=subprocess.PIPE)
+        #         repeat = True
+        #     else:
+        #         return None
+        # if temp and "real" in temp:
+        #     r= temp.split("real")[1].splitlines()[0].strip(' \t\r\n')
+        #     try:
+        #         a = float(r[2:-1])
+        #         minimum = min(minimum, a)
+        #         maximum = max(maximum, a)
+        #     except Exception:
+        #         pass
+        # if math.isinf(minimum) or math.isinf(maximum):
+        #     if port == "22":
+        #         return self.rtt_range(url, port="80")
+        #     elif port == "80":
+        #         return self.rtt_range(url, port="443")
+        #     else:
+        #         return None
+        # else:
+        #     return [minimum, maximum]
+
+        # ranges = []
+        # min_max_tuple = []
+        # temp = subprocess.run(["sh","-c","time echo -e \'\x1dclose\x0d\' | telnet " + "172.217.4.206 80"], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        # temp_time = temp.stderr.decode()
+        #
+        #
+        #
 
 
 
