@@ -301,61 +301,6 @@ class Scanner:
 
 
 
-
-
-
-
-
-
-
-
-        # minimum = float('inf')
-        # maximum = float('-inf')
-        # repeat = False
-        # try:
-        #     temp = subprocess.run(["sh","-c","time echo -e '\x1dclose\x0d' | telnet " + url + " " + port], stdout = subprocess.PIPE, stderr=subprocess.PIPE)
-        #     print(temp.stderr.decode())
-        # except subprocess.CalledProcessError as c:
-        #     return c.output.decode()
-        # except Exception as e:
-        #     if not repeat:
-        #         temp = subprocess.run(["sh","-c","time echo -e '\x1dclose\x0d' | telnet " + url + " " + port], stdout = subprocess.PIPE, stderr=subprocess.PIPE)
-        #         repeat = True
-        #     else:
-        #         return None
-        # if temp and "real" in temp:
-        #     r= temp.split("real")[1].splitlines()[0].strip(' \t\r\n')
-        #     try:
-        #         a = float(r[2:-1])
-        #         minimum = min(minimum, a)
-        #         maximum = max(maximum, a)
-        #     except Exception:
-        #         pass
-        # if math.isinf(minimum) or math.isinf(maximum):
-        #     if port == "22":
-        #         return self.rtt_range(url, port="80")
-        #     elif port == "80":
-        #         return self.rtt_range(url, port="443")
-        #     else:
-        #         return None
-        # else:
-        #     return [minimum, maximum]
-
-        # ranges = []
-        # min_max_tuple = []
-        # temp = subprocess.run(["sh","-c","time echo -e \'\x1dclose\x0d\' | telnet " + "172.217.4.206 80"], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-        # temp_time = temp.stderr.decode()
-        #
-        #
-        #
-
-
-
-
-
-
-
-
 main = Scanner(sys.argv[1], sys.argv[2])
 
 
