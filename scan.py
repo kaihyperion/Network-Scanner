@@ -16,9 +16,6 @@ import sys  # necessary for sys.argv
 import subprocess
 
 import requests  # Necessary for Http_server parts
-import itertools
-import math
-import socket
 import maxminddb
 
 """
@@ -63,20 +60,20 @@ class Scanner:
         for url in self.url_list:
             self.result[url] = {}
 
-            # self.result[url]["scan_time"] = self.scan_time()       #PASSED ON MOORE
-            #self.result[url]["ipv4_addresses"] = self.ipv_addresses(url, ipv4or6='-type=A')  # PASSED ON MOORE
-            # self.result[url]["ipv6_addresses"] = self.ipv_addresses(url, ipv4or6='-type=AAAA')     #PASSED ON MOORE
-            # self.result[url]["http_server"] = self.http_server(url)            #PASSED ON MOORE
-            # self.result[url]["insecure http"], self.result[url]["redirect"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url) #PASSED ON MOORE
-            # self.result[url]["tls_versions"] = list(itertools.compress(self.list_of_tls_names, selectors=self.tls_version(url))) #PASSED ON MOORE
+            self.result[url]["scan_time"] = self.scan_time()       #PASSED ON MOORE
+            self.result[url]["ipv4_addresses"] = self.ipv_addresses(url, ipv4or6='-type=A')  # PASSED ON MOORE
+            self.result[url]["ipv6_addresses"] = self.ipv_addresses(url, ipv4or6='-type=AAAA')     #PASSED ON MOORE
+            self.result[url]["http_server"] = self.http_server(url)            #PASSED ON MOORE
+            self.result[url]["insecure http"], self.result[url]["redirect"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url) #PASSED ON MOORE
+            self.result[url]["tls_versions"] = list(itertools.compress(self.list_of_tls_names, selectors=self.tls_version(url))) #PASSED ON MOORE
 
             self.result[url]["root_ca"] = self.root_ca(url)
-            #rdns_list = []
-            #for ipv4 in self.result[url]["ipv4_addresses"]:
-                #self.result[url]["rdns_names"] = self.rdns_names(ipv4, rdns_list)
+            rdns_list = []
+            for ipv4 in self.result[url]["ipv4_addresses"]:
+                self.result[url]["rdns_names"] = self.rdns_names(ipv4, rdns_list)
 
-            # self.result[url]["rtt_range"] = self.rtt_range(url)     #PASSED ON MOORE
-            #self.result[url]["geo_locations"] = self.geo_locations(url)     #PASSED ON MOORE
+            self.result[url]["rtt_range"] = self.rtt_range(url)     #PASSED ON MOORE
+            self.result[url]["geo_locations"] = self.geo_locations(url)     #PASSED ON MOORE
 
         with open(self.output_json, 'w') as writer:
             # print(self.result)
@@ -193,10 +190,7 @@ class Scanner:
     # Just list the "organization name" (found under'O") - Can be found using openssl
     def root_ca(self, url):
         repeat = 0
-        bool_result = []
-        repeat = 0
         print("starting :", url)
-        r= None
         ca= None
         while True:
             try:
@@ -223,48 +217,6 @@ class Scanner:
                 else:
                     return ca
             
-        # port_num = 443
-        # result = None
-        # repeat = 0
-        # while repeat < 3:
-        #     try:
-        #         result = subprocess.check_output(['openssl', 's_client','-connect', url+':443'], timeout = 5, stderr=subprocess.PIPE, stdout=subprocess.PIPE).decode()
-        #     except:
-        #         print("timeout/error")
-        #
-        # if result != None:
-        #     if not ("No client certificate" in result or "Certificate chain" not in result):
-        #         certChain = result.split("Certificate chain\n")[0]
-        #         depths = certChain.split("depth=")
-        #         maxdepth = depths[1]
-        #         orgName = maxdepth.split("O = ")[1].split(",")[0]
-        #         return orgName
-        # else:
-        #     return None
-
-        # while True:
-        #     try:
-        #         result = subprocess.check_output(["openssl", "s_client", "-connect", url + ":" + str(port_num)],input = b'', stderr=subprocess.STDOUT, timeout = 2)
-        #         temp = result.decode()
-        #         if "O " in temp:
-        #             temp = temp[temp.index("O "):len(temp)]
-        #             temp = temp[0:temp.index("\n")]
-        #             if temp[4] == '"':
-        #                 finish = temp[5:len(temp)]
-        #                 return finish[0:finish.index('"')]
-        #             temp = temp[temp.index("o ") + 4:temp.index(",")]
-        #         if temp[0] == " ":
-        #             temp = temp[1:len(temp)]
-        #         return temp
-        #     except:
-        #         return None
-        # port_num = 443
-        # while True:
-        #     result = subprocess.run(["openssl", "s_client", "-connect", url + ":" + str(port_num)],
-        #                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        #     out = result.stdout.decode('utf-8').split("O = ")[1]
-        #     out = out.split(", CN")[0]
-        #     return out
 
     def rdns_names(self, ipv4, rdns_list):
         repeat = 0
