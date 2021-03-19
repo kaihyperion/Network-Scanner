@@ -66,9 +66,9 @@ class Scanner:
             # self.result[url]["scan_time"] = self.scan_time()       #PASSED ON MOORE
             self.result[url]["ipv4_addresses"] = self.ipv_addresses(url, ipv4or6='-type=A')  # PASSED ON MOORE
             # self.result[url]["ipv6_addresses"] = self.ipv_addresses(url, ipv4or6='-type=AAAA')     #PASSED ON MOORE
-            # self.result[url]["http_server"] = self.http_server(url)            #runs / waiting confirm
-            # self.result[url]["insecure http"], self.result[url]["redirect"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url) #runs waiting on confirm
-            # self.result[url]["tls_versions"] = list(itertools.compress(self.list_of_tls_names, selectors=self.tls_version(url))) #runs waiting on confirm
+            # self.result[url]["http_server"] = self.http_server(url)            #PASSED ON MOORE
+            # self.result[url]["insecure http"], self.result[url]["redirect"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url) #PASSED ON MOORE
+            # self.result[url]["tls_versions"] = list(itertools.compress(self.list_of_tls_names, selectors=self.tls_version(url))) #PASSED ON MOORE
 
             # self.result[url]["root_ca"] = self.root_ca(url)
             rdns_list = []
@@ -76,7 +76,7 @@ class Scanner:
             # self.result[url]["rdns_names"] = self.rdns_names(ipv4, rdns_list)
 
             # self.result[url]["rtt_range"] = self.rtt_range(url)     #PASSED ON MOORE
-            self.result[url]["geo_locations"] = self.geo_locations(url)
+            self.result[url]["geo_locations"] = self.geo_locations(url)     #PASSED ON MOORE
 
         with open(self.output_json, 'w') as writer:
             # print(self.result)
