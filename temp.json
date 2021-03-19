@@ -1,132 +1,50 @@
 {
     "northwestern.edu": {
-        "ipv4_addresses": [
-            "129.105.136.48",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "Northwestern University"
     },
     "mccormick.northwestern.edu": {
-        "ipv4_addresses": [
-            "129.105.1.129",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "Northwestern University"
     },
     "kellogg.northwestern.edu": {
-        "ipv4_addresses": [
-            "165.124.147.150",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "Northwestern University"
     },
     "users.cs.northwestern.edu": {
-        "ipv4_addresses": [
-            "165.124.180.20",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "Northwestern University"
     },
     "it.eecs.northwestern.edu": {
-        "ipv4_addresses": [
-            "129.105.8.2",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "Northwestern University"
     },
     "uchicago.edu": {
-        "ipv4_addresses": [
-            "34.200.129.209",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "The University of Chicago"
     },
     "illinois.edu": {
-        "ipv4_addresses": [
-            "192.17.172.3",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "University of Illinois"
     },
     "stevetarzia.com": {
-        "ipv4_addresses": [
-            "54.245.121.172",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "Let's Encrypt"
     },
     "clocktab.com": {
-        "ipv4_addresses": [
-            "172.67.220.24",
-            "104.21.35.119",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "CloudflareInc."
     },
     "auditoryneuroscience.com": {
-        "ipv4_addresses": [
-            "144.214.26.111",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "Let's Encrypt"
     },
     "asee.org": {
-        "ipv4_addresses": [
-            "216.185.13.131",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "Sectigo Limited"
     },
     "gradeinflation.com": {
-        "ipv4_addresses": [
-            "66.70.176.24",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "Let's Encrypt"
     },
     "spacejam.com": {
-        "ipv4_addresses": [
-            "75.2.104.223",
-            "99.83.180.228",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "WARNER BROS. ENTERTAINMENT INC."
     },
     "pmichaud.com": {
-        "ipv4_addresses": [
-            "23.254.203.248",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "cPanelInc."
     },
     "kli.org": {
-        "ipv4_addresses": [
-            "104.21.22.57",
-            "172.67.202.249",
-            "54.144.128.85"
-        ],
-        "root_ca": null
+        "root_ca": "CloudflareInc."
     },
     "google.com": {
-        "ipv4_addresses": [
-            "216.58.192.238",
-            "172.217.4.46",
-            "172.217.9.46",
-            "172.217.1.142",
-            "173.194.219.102",
-            "173.194.219.101",
-            "173.194.219.113",
-            "173.194.219.139",
-            "173.194.219.100",
-            "173.194.219.138",
-            "172.217.7.14",
-            "216.58.202.142",
-            "172.217.9.78",
-            "216.239.38.120",
-            "142.250.64.78",
-            "54.144.128.85",
-            "142.250.186.110"
-        ],
-        "root_ca": null
+        "root_ca": "Google LLC"
     }
 }

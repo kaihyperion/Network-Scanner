@@ -64,7 +64,7 @@ class Scanner:
             self.result[url] = {}
 
             # self.result[url]["scan_time"] = self.scan_time()       #PASSED ON MOORE
-            self.result[url]["ipv4_addresses"] = self.ipv_addresses(url, ipv4or6='-type=A')  # PASSED ON MOORE
+            #self.result[url]["ipv4_addresses"] = self.ipv_addresses(url, ipv4or6='-type=A')  # PASSED ON MOORE
             # self.result[url]["ipv6_addresses"] = self.ipv_addresses(url, ipv4or6='-type=AAAA')     #PASSED ON MOORE
             # self.result[url]["http_server"] = self.http_server(url)            #PASSED ON MOORE
             # self.result[url]["insecure http"], self.result[url]["redirect"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url) #PASSED ON MOORE
@@ -198,22 +198,31 @@ class Scanner:
         print("starting :", url)
         r= None
         ca= None
-        while repeat < 3:
+        while True:
             try:
-                r = subprocess.run(['openssl', 's_client', '-connect', url + ':443'],
-                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=b'', timeout=2)
-            except:
-                print("Timed out: Retry")
-                repeat += 1
-            if r != None:
+                r = subprocess.run(['openssl', 's_client', '-connect', url + ':443'],stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=b'', timeout=5)
+                print("openssl worked")
                 result = r.stdout.decode().splitlines()
                 temp = r.stdout.decode().split(', ')
-                if ("Certificate chain" in result) and not("No client certificate" in result):
-                    for i in temp:
-                        if i.startswith("0 = "):
-                            ca = i.split("0 = ")[-1]
-                            return ca
-        return ca
+                print(result)
+                print(temp)
+                ind = 0
+                for i in temp:
+                    if i.startswith("O = "):
+                        ca = i.split("O = ")[-1]
+                        if ca[0] == '"':
+                            next_word = temp[ind+1][:-1]
+                            ca = ca[1:] + next_word
+                        return ca
+                    ind += 1
+                return ca
+            except:
+                if repeat < 3:
+                    print("Timed out: Retry")
+                    repeat += 1
+                else:
+                    return ca
+            
         # port_num = 443
         # result = None
         # repeat = 0
