@@ -62,19 +62,20 @@ class Scanner:
 
         for url in self.url_list:
             self.result[url]={}
-            self.result[url]["rtt_range"] = self.rtt_range(url)
-            self.result[url]["scan_time"] = self.scan_time()       #Pass
-            self.result[url]["ipv4_addresses"] = self.ipv_addresses(url, ipv4or6 = '-type=A')      #Pass
-            self.result[url]["ipv6_addresses"] = self.ipv_addresses(url, ipv4or6='-type=AAAA')     #Pass
-            self.result[url]["http_server"] = self.http_server(url)            #Pass
+            #self.result[url]["rtt_range"] = self.rtt_range(url)     #Good on windows
+            #self.result[url]["scan_time"] = self.scan_time()       #Pass on widnows
+            self.result[url]["ipv4_addresses"] = self.ipv_addresses(url, ipv4or6 = '-type=A')      #Pass on windows
+            #self.result[url]["ipv6_addresses"] = self.ipv_addresses(url, ipv4or6='-type=AAAA')     #Pass on windows
+            #self.result[url]["http_server"] = self.http_server(url)            #Pass on windows
 
-            self.result[url]["insecure http"], self.result[url]["redirect"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url) #Pass
+            #self.result[url]["insecure http"], self.result[url]["redirect"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url) #Pass on windows
 
             #self.result[url]["tls_versions"] = list(itertools.compress(self.list_of_tls_names, selectors=self.tls_version(url))) #Passed on linux
 
             #self.result[url]["root_ca"] = self.root_ca(url)
+            rdns_list=[]
             for ipv4 in self.result[url]["ipv4_addresses"]:
-                self.result[url]["rdns_names"] = self.rdns_names(ipv4)
+                self.result[url]["rdns_names"] = self.rdns_names(ipv4, rdns_list)
 
 
 
@@ -99,7 +100,6 @@ class Scanner:
                     for sub in temp:
                         if sub.startswith("Name"):
                             addr_list = temp[idx+1:]
-                            print(addr_list)
                             break
                         idx += 1
 
@@ -109,7 +109,6 @@ class Scanner:
                             keyword_flag = False
                         if len(i.split()) != 0 and (keyword_flag == True):
                             ipv = i.split()[-1]
-                            print(ipv)
                             if ipv in ipv_list:
                                 pass
                             else:
@@ -160,34 +159,7 @@ class Scanner:
         except:
             print("error or timeout in insecure http",url)
             return insecure_flag, redirect_flag, hsts_flag
-    # def http_redirect(self, url):
-    #     redirect_flag = False
-    #     site = "http://" + url +":80"
-    #     self.requestor.max_redirect = 10
-    #
-    #     try:
-    #         r = self.requestor.get(site, timeout = self.timeout)
-    #         if len(r.history) > 0 and r.url[0:8] == "https://":
-    #             redirect_flag = True
-    #         elif len(r.history) == 0:
-    #             redirect_flag = False
-    #         return redirect_flag
-    #     except:
-    #         print("error/timeout in redirect")
-    #         return redirect_flag
-    #
-    # def hsts(self,url):
-    #     hsts_flag = False
-    #     site = "http://" + url +"80"
-    #
-    #     try:
-    #         r = self.requestor.get(site, timeout = self.timeout)
-    #         if 'Strict-Transport-Security' in r.headers and r.url[0:8] == "https://":
-    #             hsts_flag = True
-    #         return hsts_flag
-    #     except:
-    #         print("error or timout in hsts",url)
-    #         return None
+
     def tls_version(self, url):
 
         repeat = 0
@@ -229,17 +201,19 @@ class Scanner:
             out = out.split(", CN")[0]
             return out
 
-    def rdns_names(self, ipv4):
+    def rdns_names(self, ipv4, rdns_list):
         repeat = 0
         while True:
             try:
-                result = subprocess.run(["nslookup", "-type=PTR", ipv4], timeout = 2, stdout = subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
+                result = subprocess.run(["nslookup", "-type=PTR", ipv4], timeout = 5, stdout = subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
                 result = result.splitlines()
-                rdns_list = []
+
                 for i in result:
                     if "name = " in i:
                         output = i.split('name = ')[1].strip(' \t\r\n')
-                        rdns_list.append(output)
+                        if output not in rdns_list:
+                            rdns_list.append(output)
+                return rdns_list
 
             except:
                 if repeat < 3:
@@ -247,8 +221,9 @@ class Scanner:
                     repeat += 1
                 else:
                     pass
+                    return rdns_list
 
-            return rdns_list
+
 
 
     def rtt_range(self, url):
