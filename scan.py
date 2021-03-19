@@ -51,7 +51,7 @@ class Scanner:
             self.result[url]["http_server"] = self.http_server(url)
             self.result[url]["insecure_http"], self.result[url]["redirect_to_https"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url)
             self.result[url]["tls_versions"] = list(itertools.compress(self.list_of_tls_names, selectors=self.tls_version(url)))
-            #self.result[url]["root_ca"] = self.root_ca(url)
+            self.result[url]["root_ca"] = self.root_ca(url)
             rdns_list = []
             for ipv4 in self.result[url]["ipv4_addresses"]:
                 self.result[url]["rdns_names"] = self.rdns_names(ipv4, rdns_list)
@@ -92,7 +92,7 @@ class Scanner:
                             else:
                                 ipv_list.append(ipv)
                 except:
-                    print("error or timeout in ipv lookup, Retrying:", url)
+                    #print("error or timeout in ipv lookup, Retrying:", url)
                     pass
             return ipv_list
 
@@ -109,7 +109,7 @@ class Scanner:
                     server_name = r.headers['server']
                 return server_name
             except:
-                print("error or timeout in http_server", url)
+                #print("error or timeout in http_server", url)
                 return None
 
 
@@ -129,7 +129,7 @@ class Scanner:
                 hsts_flag = True
             return insecure_flag, redirect_flag, hsts_flag
         except:
-            print("error or timeout in insecure_redirect_hsts",url)
+            #print("error or timeout in insecure_redirect_hsts",url)
             return insecure_flag, redirect_flag, hsts_flag
 
 
@@ -153,7 +153,7 @@ class Scanner:
                     bool_result.append(tls_flag)
             except:
                 if repeat < 3:
-                    print("timeout in tls_version, Retrying:", url)
+                    #print("timeout in tls_version, Retrying:", url)
                     repeat += 1
                 else:
                     pass
@@ -163,12 +163,29 @@ class Scanner:
     # List the root CA at the base of the chain of trust for validating this server's public key.
     # Just list the "organization name" (found under'O") - Can be found using openssl
     def root_ca(self, url):
-        port_num = 443
+        repeat = 0
+        ca = None
         while True:
-            result = subprocess.run(["openssl","s_client", "-connect",url+":"+str(port_num)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            out = result.stdout.decode('utf-8').split("O = ")[1]
-            out = out.split(", CN")[0]
-            return out
+            try:
+                r = subprocess.run(['openssl', 's_client', '-connect', url + ':443'],stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=b'', timeout = 5)
+                result = r.stdout.decode().splitlines()
+                temp = r.stdout.decode().split(', ')
+                ind = 0
+                for i in temp:
+                    if i.startswith("O = "):
+                        ca = i.split("O = ")[-1]
+                        if ca[0] == '"':
+                            next_word = temp[ind+1][:-1]
+                            ca = ca[1:] + next_word
+                        return ca
+                    ind += 1
+                return ca
+            except:
+                if repeat < 3:
+                    #print("error or timeout in rdns_names, Retrying:", url)
+                    repeat += 1
+                else:
+                    return ca
 
 
     def rdns_names(self, ipv4, rdns_list):
@@ -185,7 +202,7 @@ class Scanner:
                 return rdns_list
             except:
                 if repeat < 3:
-                    print("error or timeout in rdns_names, Retrying")
+                    #print("error or timeout in rdns_names, Retrying")
                     repeat += 1
                 else:
                     pass
@@ -226,17 +243,18 @@ class Scanner:
             geo = self.r.get(ipv4)
             out = ""
             result = self.geo_extracpolator(geo)
-            if len(result) > 1:
-                for i in result[:-1]:
-                    out += i +", "
-                out += result[-1]
-            else:
-                out += result[0]
-            output.append(out)
+            if result is not None:
+                if len(result) > 1:
+                    for i in result[:-1]:
+                        out += i +", "
+                    out += result[-1]
+                else:
+                    out += result[0]
+                output.append(out)
         return list(set(output))
 
     def geo_extracpolator(self, geo):
-        checker = ['city', 'subdivisions', 'country']
+        checker = ['city', 'subdivisions', 'country'] # SUBDIVISION = STATE
         result = []
         for i in checker:
             if i == 'subdivisions':
@@ -245,7 +263,10 @@ class Scanner:
             else:
                 if i in geo:
                     result.append(geo[i]['names']['en'])
-        return result
+        if len(result) == 0:
+            return None
+        else:
+            return result
 
 
 

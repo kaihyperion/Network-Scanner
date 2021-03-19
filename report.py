@@ -20,12 +20,8 @@ class Report:
         for website in self.website_data.keys():
             self.websites.append(website)
 
-        # insert these back in later #
-        #self.rootca_table(),
-        #"### ROOT CA'S: ###\n"
-
-        self.tables = [self.general_table(), self.rtt_table(), self.server_table(), self.percent_table()]
-        self.labels = ["### ALL PART 2 INFORMATION: ###\n", "### RTT RANGES: ###\n","### WEB SERVERS: ###\n","### SUPPORT FOR: ###\n"]
+        self.tables = [self.general_table(), self.rtt_table(), self.rootca_table(), self.server_table(), self.percent_table()]
+        self.labels = ["### ALL PART 2 INFORMATION: ###\n", "### RTT RANGES: ###\n", "### ROOT CA'S: ###\n", "### WEB SERVERS: ###\n","### SUPPORT FOR: ###\n"]
 
         with open(self.output_file, 'w') as output:
             for i in range(len(self.tables)):
@@ -61,7 +57,6 @@ class Report:
         for s in self.website_data[self.websites[0]].keys():
             scanners.append(s)
 
-        num_rows = len(self.websites) + 1
         num_cols = len(scanners)
 
         ### BUILD MATRIX: a list of lists, where each list contains the information for a website ###
@@ -96,7 +91,6 @@ class Report:
 
         rtt_tuples = sorted(rtt_tuples, key=lambda tup: tup[2])
 
-        num_rows = len(rtt_tuples) + len(rtt_null) + 1
         num_cols = 2
 
         ### BUILD MATRIX: a list of lists, where each list contains the rtt information for a website ###
@@ -135,7 +129,6 @@ class Report:
         tuples = sorted(tuples, key=lambda tup: tup[1])
         tuples.reverse()
 
-        num_rows = len(tuples) + 1
         num_cols = 2
 
         ### BUILD MATRIX: a list of lists, where each list contains the information for a ca ###
@@ -170,7 +163,6 @@ class Report:
         tuples = sorted(tuples, key=lambda tup: tup[1])
         tuples.reverse()
 
-        num_rows = len(tuples) + 1
         num_cols = 2
 
         ### BUILD MATRIX: a list of lists, where each list contains the information for a server ###
@@ -219,7 +211,6 @@ class Report:
                         if value is True:
                             categories[c] += 1
 
-        num_rows = len(categories) + len(tls_dict)
         num_cols = 2
 
         ### BUILD MATRIX: a list of lists, where each list contains the information for a category ###
