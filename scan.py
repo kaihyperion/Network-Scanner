@@ -37,13 +37,12 @@ class Scanner:
         self.port_list = [80, 443, 22]
         self.public_dns_resolvers = ["208.67.222.222", "1.1.1.1","8.8.8.8","8.26.56.26","9.9.9.9","64.6.65.6","91.239.100.100","185.228.168.168","77.88.8.7","156.154.70.1","198.101.242.72","176.103.130.130"]
 
-
         # Session(): learned from requests.readthedocs.io/en/master/user/advanced/
         self.requestor = requests.Session()
         self.timeout = 2
 
         #TLS VERsion:
-        self.list_of_tls_names = ['TLSv1','TLSv1.1','TLSv1.2', 'TLSv1.3']
+        self.list_of_tls_names = ['TLSv1.0','TLSv1.1','TLSv1.2', 'TLSv1.3']
         self.list_of_tls_commands = ['-tls1', '-tls1_1', '-tls1_2', '-tls1_3']
 
         # parse through txt file and put url into list.
@@ -55,12 +54,12 @@ class Scanner:
         for url in self.url_list:
             print('now scanning:', url)
             self.result[url]={}
-            self.result[url]["scan_time"] = self.scan_time()
+            #self.result[url]["scan_time"] = self.scan_time()
             self.result[url]["ipv4_addresses"] = self.ipv_addresses(url, ipv4or6 = '-type=A')
             self.result[url]["ipv6_addresses"] = self.ipv_addresses(url, ipv4or6='-type=AAAA')
             self.result[url]["http_server"] = self.http_server(url)
             self.result[url]["insecure_http"], self.result[url]["redirect_to_https"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url)
-            #self.result[url]["tls_versions"] = list(itertools.compress(self.list_of_tls_names, selectors=self.tls_version(url)))
+            self.result[url]["tls_versions"] = list(itertools.compress(self.list_of_tls_names, selectors=self.tls_version(url)))
             #self.result[url]["root_ca"] = self.root_ca(url)
             for ipv4 in self.result[url]["ipv4_addresses"]:
                 self.result[url]["rdns_names"] = self.rdns_names(ipv4)
