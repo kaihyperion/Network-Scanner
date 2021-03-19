@@ -65,7 +65,7 @@ class Scanner:
             #self.result[url]["rtt_range"] = self.rtt_range(url)     #Good on windows
             #self.result[url]["scan_time"] = self.scan_time()       #Pass on widnows
             self.result[url]["ipv4_addresses"] = self.ipv_addresses(url, ipv4or6 = '-type=A')      #Pass on windows
-            #self.result[url]["ipv6_addresses"] = self.ipv_addresses(url, ipv4or6='-type=AAAA')     #Pass on windows
+            self.result[url]["ipv6_addresses"] = self.ipv_addresses(url, ipv4or6='-type=AAAA')     #Pass on windows
             #self.result[url]["http_server"] = self.http_server(url)            #Pass on windows
 
             #self.result[url]["insecure http"], self.result[url]["redirect"],self.result[url]["hsts"] = self.http_insecure_redirect_hsts(url) #Pass on windows
@@ -74,8 +74,8 @@ class Scanner:
 
             #self.result[url]["root_ca"] = self.root_ca(url)
             rdns_list=[]
-            for ipv4 in self.result[url]["ipv4_addresses"]:
-                self.result[url]["rdns_names"] = self.rdns_names(ipv4, rdns_list)
+            #for ipv4 in self.result[url]["ipv4_addresses"]:
+               # self.result[url]["rdns_names"] = self.rdns_names(ipv4, rdns_list)
 
 
 
@@ -100,13 +100,14 @@ class Scanner:
                     for sub in temp:
                         if sub.startswith("Name"):
                             addr_list = temp[idx+1:]
-                            break
+
                         idx += 1
 
                     for i in addr_list:
                         keyword_flag = True
                         if i.startswith("Aliases:"):
                             keyword_flag = False
+
                         if len(i.split()) != 0 and (keyword_flag == True):
                             ipv = i.split()[-1]
                             if ipv in ipv_list:
