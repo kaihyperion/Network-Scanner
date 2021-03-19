@@ -14,7 +14,7 @@ import time
 import json
 import sys  # necessary for sys.argv
 import subprocess
-
+import itertools
 import requests  # Necessary for Http_server parts
 import maxminddb
 
