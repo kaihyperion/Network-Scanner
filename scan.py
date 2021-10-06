@@ -1,5 +1,5 @@
 """
-Write a Python 3 program that takes a list of web domains as an input
+Program that takes a list of web domains as an input
 and outs a JSON dictionary with information about each domain.
 python3 scan.py [input_file.txt] [output_file.json]
 
